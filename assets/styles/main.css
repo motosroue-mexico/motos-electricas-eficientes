@@ -1021,7 +1021,7 @@ header img:hover, footer img:hover, footer .politicas a:hover {
   }
 }
 
-#convierteteDistribuidor *, #distribuidorOficial *, header, #thankyou * {
+header, #thankyou * {
   opacity: 0;
   animation: aparecerDesdeAbajoBanner 0.8s ease-out forwards;
 }
