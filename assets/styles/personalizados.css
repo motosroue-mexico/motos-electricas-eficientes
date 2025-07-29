@@ -1,20 +1,20 @@
 footer a{color:white;display: block;}
 header nav {justify-content: center;align-items: center;margin: 15px 30px;position: relative;gap: 15px;}
-footer h4 {margin: 20px 0px;}
+footer h4, footer h3 {margin: 20px 0px;}
 footer small {display: block;padding: 10px;text-align: center;}
 footer nav {align-items: center;justify-content: space-around;padding: 15px;}
 footer .redesSociales ul {display: flex;align-items: center;justify-content: center;}
-#convierteteDistribuidor {background-image: url(/assets/images/fondoDistribuidor.png);max-width: 100%;}
-#negocioLejos{background-image: url(/assets/images/world.png);max-width: 100%;background-repeat: no-repeat;    }
+#convierteteDistribuidor {background-image: url(/assets/images/fondoDistribuidor.webp);max-width: 100%;}
+#negocioLejos{background-image: url(/assets/images/world.webp);max-width: 100%;background-repeat: no-repeat;    }
 #distribuidor {padding: 50px 0px 100px;}
 #distribuidor p:nth-of-type(2){margin: 45px 0px;max-width: 670px;}
-#respuestasTitulo{background-image: url(/assets/images/banner-faq.png);}
+#respuestasTitulo{background-image: url(/assets/images/banner-faq.webp);}
 #distribuidorOficial{background-color: var(--azulBajo);}
 #porqueElegirnos{background-color: var(--azulFuerte);    border-top-left-radius: 150px;border-top-right-radius: 150px;}
-#thankyou, #distribuidorOficial{background-image: url(/assets/images/bannerGracias.png);}
-#aprovechaBeneficios{background-image: url(/assets/images/banner-form-dist.png);}
+#thankyou, #distribuidorOficial{background-image: url(/assets/images/bannerGracias.webp);}
+#aprovechaBeneficios{background-image: url(/assets/images/banner-form-dist.webp);}
 #porqueElegirnos{
-  background-image: url("/assets/images/porqueElegirnos.png");
+  background-image: url("/assets/images/porqueElegirnos.webp");
 }
 #convierteteDistribuidor, #respuestasTitulo, #thankyou, #distribuidorOficial, #aprovechaBeneficios, #porqueElegirnos
 {background-position: center;background-size: cover;background-repeat: no-repeat;}
