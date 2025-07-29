@@ -18,6 +18,32 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
 #porqueElegirnos{
   background-image: url("/assets/images/porqueElegirnos.webp");
 }
+#mc_embed_signup{
+  background: transparent;
+  width: 100%;
+}
+#mc_embed_signup h2, #mc_embed_signup .indicates-required {
+  width: 100%;
+}
+#mc_embed_signup .mensaje.mc-field-group {
+    width: 100%;
+}
+#mc_embed_signup_scroll {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+@media (min-width:768px){
+  #formulario {
+    max-width: 50%;
+  }
+  #mc_embed_signup .mc-field-group{
+    width: 100%;
+  }
+  #mc_embed_signup .mc-field-group{
+    width: 47%;
+  }
+}
 #convierteteDistribuidor, #respuestasTitulo, #thankyou, #distribuidorOficial, #aprovechaBeneficios, #porqueElegirnos
 {background-position: center;background-size: cover;background-repeat: no-repeat;}
 #distribuidor h1{font-weight: 800;}
@@ -155,8 +181,8 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
 
 #aprovechaBeneficios{
   display: flex;
-  flex-wrap: wrap;
   max-width: 100%;
+  align-items: center;
 }
 #beneficiosDistribuidor h2{font-weight: 900;letter-spacing: 1px}
 #beneficiosDistribuidor h3{font-weight: 400;}
@@ -316,7 +342,7 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
     #thankyou img {width: 300px;left: 200px;}}
     
 @media (max-width:1200px){
-    #aprovechaBeneficios{padding: 25px;}
+    #aprovechaBeneficios{padding: 25px; flex-wrap: wrap;justify-content: center;}
     #distribuidorOficial img.derecha, #distribuidorOficial img.izquierda{width: 200px;}
     #thankyou img {width: 100px;left: 10px;}
     #carruselProductos div {justify-content: flex-start;overflow: auto;}
@@ -348,7 +374,6 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
     width: 550px;
     height: auto;
   }
-    #aprovechaBeneficios{justify-content: space-between;}
     #beneficiosDistribuidor > img {width: 570px;}
     #adaptadoNecesidades article div {width: 33%;}
     #adaptadoNecesidades h3 {bottom: -47px;}}
@@ -728,7 +753,6 @@ y desktop */
 
 strong{font-weight: 700;}
 #formulario form {
-    max-width: 690px;
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
