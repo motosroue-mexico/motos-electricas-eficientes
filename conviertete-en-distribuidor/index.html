@@ -107,7 +107,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <footer id="footer-container"></footer>
 
 <script defer>
-  // Cargar un componente en un contenedor por ID
+  // Función para cargar un componente en un contenedor por ID
   async function loadComponent(id, file) {
     try {
       const res = await fetch(file);
@@ -120,18 +120,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
   }
 
-  // Carga individual por secciones
-  loadComponent('header-container', '/components/headerDistribuidores.html');
-  loadComponent('footer-container', '/components/footerDistribuidores.html');
-
-  loadComponent('distribuidorOficial', '/components/distribuidorOficial.html');
-  loadComponent('exclusivos', '/components/exclusivos.html');
-  loadComponent('formulario', '/components/formularioDeyac.html');
-  loadComponent('beneficiosDistribuidor', '/components/beneficiosDistribuidor.html');
-  loadComponent('porqueElegirnos', '/components/porqueElegirnos.html');
-  loadComponent('nuevosProductos', '/components/nuevosProductos.html');
-
-  // Cargar múltiples componentes en un mismo contenedor (opcional)
+  // Función para cargar múltiples componentes en un mismo contenedor
   async function loadMultipleComponents(containerId, files) {
     const container = document.getElementById(containerId);
     for (const file of files) {
@@ -146,7 +135,22 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       }
     }
   }
+
+  // Carga prioritaria en orden secuencial
+  (async () => {
+    await loadComponent('header-container', '/components/headerDistribuidores.html');
+    await loadComponent('distribuidorOficial', '/components/distribuidorOficial.html');
+    await loadComponent('formulario', '/components/formularioDeyac.html');
+
+    // Resto de componentes cargados en paralelo (no críticos)
+    loadComponent('exclusivos', '/components/exclusivos.html');
+    loadComponent('beneficiosDistribuidor', '/components/beneficiosDistribuidor.html');
+    loadComponent('porqueElegirnos', '/components/porqueElegirnos.html');
+    loadComponent('nuevosProductos', '/components/nuevosProductos.html');
+    loadComponent('footer-container', '/components/footerDistribuidores.html');
+  })();
 </script>
+
 
 </body>
 </html>
