@@ -69,7 +69,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <footer id="footer-container"></footer>
 
 <script defer>
-  // Cargar un componente en un contenedor por ID
+  // Función para cargar un componente en un contenedor por ID
   async function loadComponent(id, file) {
     try {
       const res = await fetch(file);
@@ -82,19 +82,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     }
   }
 
-  // Carga individual por secciones
-  loadComponent('header-container', '/components/headerContenedores.html');
-  loadComponent('footer-container', '/components/footerContenedores.html');
-  loadComponent('distribuidor', '/components/distribuidor.html');
-  loadComponent('formulario', '/components/formulario.html');
-  loadComponent('lideraMercado', '/components/lideraMercado.html');
-  loadComponent('negocioLejos', '/components/negocioLejos.html');
-  loadComponent('gamaCompleta', '/components/gamaCompleta.html');
-  loadComponent('adaptadoNecesidades', '/components/adaptadoNecesidades.html');
-  loadComponent('respuestasTitulo', '/components/respuestasTitulo.html');
-  loadComponent('faqs', '/components/faqs.html');
-
-  // Cargar múltiples componentes en un mismo contenedor (opcional)
+  // Función para cargar múltiples componentes en un mismo contenedor
   async function loadMultipleComponents(containerId, files) {
     const container = document.getElementById(containerId);
     for (const file of files) {
@@ -109,7 +97,22 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       }
     }
   }
+
+  // Carga secuencial en el orden visual real
+  (async () => {
+    await loadComponent('header-container', '/components/headerContenedores.html');
+    await loadComponent('distribuidor', '/components/distribuidor.html');
+    await loadComponent('formulario', '/components/formulario.html');
+    await loadComponent('lideraMercado', '/components/lideraMercado.html');
+    await loadComponent('negocioLejos', '/components/negocioLejos.html');
+    await loadComponent('gamaCompleta', '/components/gamaCompleta.html');
+    await loadComponent('adaptadoNecesidades', '/components/adaptadoNecesidades.html');
+    await loadComponent('respuestasTitulo', '/components/respuestasTitulo.html');
+    await loadComponent('faqs', '/components/faqs.html');
+    await loadComponent('footer-container', '/components/footerContenedores.html');
+  })();
 </script>
+
 
 </body>
 </html>
