@@ -1,3 +1,5 @@
+/* CSS PERSONALIZADO */
+
 footer a{color:white;display: block;}
 header nav {justify-content: center;align-items: center;margin: 15px 30px;position: relative;gap: 15px;}
 footer h4, footer h3 {margin: 20px 0px;}
@@ -502,3 +504,628 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
     #distribuidor p:nth-of-type(1){font-size: 28px;}
     #distribuidor p:nth-of-type(2){font-size: 22px;}
     #distribuidor strong{font-size: 24px;}}
+
+
+
+/* CSS MAIN */
+
+
+a.btn, button{
+    color: white;
+    background-color: var(--rojoFuerte);
+}
+
+a.btn:hover, button:hover{
+    background-color: white;
+    cursor: pointer;
+    color: var(--rojoFuerte);
+}
+
+a.btn.secundario, button.secundario{
+    background-color: var(--azulFuerte);
+    color: white;
+}
+a.btn.secundario:hover, button.secundario:hover{
+    border: 1px solid var(--azulFuerte);
+    background-color: white;
+    color: var(--azulFuerte);
+}
+
+button:disabled, button.secundario:disabled, button.secundario:disabled:hover, button:disabled:hover,
+a.deshabilitado, a.btn.deshabilitado.secundario, a.deshabilitado:hover, a.btn.secundario.deshabilitado:hover{
+    background-color: var(--gris);
+    color: var(--grisBajo);
+    border: none;
+}
+button:disabled, button.secundario:disabled, button.secundario:disabled:hover, button:disabled:hover,
+a.deshabilitado, a.btn.deshabilitado.secundario, a.deshabilitado:hover, a.btn.secundario.deshabilitado:hover, input:disabled, textarea:disabled, select:disabled, label.disabled{
+    cursor: no-drop;
+}
+label, input, textarea, select, option{
+    color: var(--azulFuerte);
+}
+input, textarea, select, #formulario details{
+    border-color: var(--negroFuerte);
+    border-radius: 5px;
+    border-width: 1px;
+    border-style: solid;
+}
+
+input:focus, textarea:focus, select:focus{
+    background-color: var(--azulAlert2);
+    outline-color: var(--azulAlert1);
+    border: 1px var(--azulAlert1);
+    outline-width: 1px;
+    outline-style: solid;
+}
+
+input:hover, textarea:hover, select:hover{
+    border: 1px var(--azulFuerte);
+    outline-color: var(--azulFuerte);
+    outline-width: 2px;
+    outline-style: solid;
+    transition: 0s;
+}
+input:disabled, textarea:disabled, select:disabled,
+input:disabled:hover, textarea:disabled:hover, select:disabled:hover{
+    background-color: var(--grisBajo);
+    outline-color: var(--gris);
+    border: 1px var(--gris);
+    color: var(--gris);
+    outline-width: 1px;
+    outline-style: solid;
+}
+label.disabled{
+    color: var(--gris);
+}
+
+::placeholder{
+    color:var(--gris)
+}
+
+.card {
+    background: white;
+    filter: drop-shadow(-4px 0px 21px var(--grisBajo));
+}
+.card:hover {
+    background: white;
+    filter: drop-shadow(4px 0px 4px var(--grisBajo));
+}
+form.enviado input:valid, form.enviado select:valid, form.enviado textarea:valid {
+    border: 2px solid var(--verdeFuerte);
+    background-color: var(--verdeBajo);
+}
+
+form.enviado input:invalid, form.enviado select:invalid, form.enviado textarea:invalid {
+    border: 2px solid var(--rojoFuerte);
+    background-color: var(--rojoBajo);
+}
+
+/*   OK OK OK OK OK OK OK OK OK OK OK OK OK   */
+
+
+
+
+
+section{
+    max-width: 1440px;
+}
+
+
+/* 🎨 ROJO */
+.BGRojoFuerte { background-color: var(--rojoFuerte); }
+.BGRojoBajo { background-color: var(--rojoBajo); }
+.CRojoFuerte { color: var(--rojoFuerte); }
+.CRojoBajo { color: var(--rojoBajo); }
+
+/* 🎨 AZUL */
+.BGAzulFuerte { background-color: var(--azulFuerte); }
+.BGAzulBajo { background-color: var(--azulBajo); }
+.CAzulFuerte { color: var(--azulFuerte); }
+.CAzulBajo { color: var(--azulBajo); }
+
+/* 🎨 GRIS */
+.BGGris { background-color: var(--gris); }
+.BGGrisBajo { background-color: var(--grisBajo); }
+.CGris { color: var(--gris); }
+.CGrisBajo { color: var(--grisBajo); }
+
+/* 🎨 NEGRO */
+.BGNegroFuerte { background-color: var(--negroFuerte); }
+.BGNegroBajo { background-color: var(--negroBajo); }
+.CNegroFuerte { color: var(--negroFuerte); }
+.CNegroBajo { color: var(--negroBajo); }
+
+/* 🎨 AZUL ALERTA */
+.BGAzulAlert1 { background-color: var(--azulAlert1); }
+.BGAzulAlert2 { background-color: var(--azulAlert2); }
+.CAzulAlert1 { color: var(--azulAlert1); }
+.CAzulAlert2 { color: var(--azulAlert2); }
+
+/* 🎨 VERDE */
+.BGVerdeFuerte { background-color: var(--verdeFuerte); }
+.BGVerdeBajo { background-color: var(--verdeBajo); }
+.CVerdeFuerte { color: var(--verdeFuerte); }
+.CVerdeBajo { color: var(--verdeBajo); }
+
+/* 🎨 AMARILLO */
+.BGAmarilloFuerte { background-color: var(--amarilloFuerte); }
+.BGAmarilloBajo { background-color: var(--amarilloBajo); }
+.CAmarilloFuerte { color: var(--amarilloFuerte); }
+.CAmarilloBajo { color: var(--amarilloBajo); }
+
+/* 🎨 NARANJA */
+.BGNaranjaFuerte { background-color: var(--naranjaFuerte); }
+.BGNaranjaBajo { background-color: var(--naranjaBajo); }
+.CNaranjaFuerte { color: var(--naranjaFuerte); }
+.CNaranjaBajo { color: var(--naranjaBajo); }
+
+
+.CBlanco{
+    color: white;
+}
+
+:root{
+  --rojoFuerte: #f70000;
+  --rojoBajo: #ffe8e7;
+
+  --azulFuerte: #262262;
+  --azulBajo: #2B3990;
+
+  --gris: #A8A8A9;
+  --grisBajo: #F1F1F1;
+  
+  --negroFuerte: #000000;
+  --negroBajo: #231F20;
+
+  --azulAlert1: #005080;
+  --azulAlert2: #e9f4ff;
+
+  --verdeFuerte: #005531;
+  --verdeBajo: #c1ffe0;
+
+  --amarilloFuerte: #ffec00;
+  --amarilloBajo: #fffad8;
+  --naranjaFuerte: #ffba00;
+  --naranjaBajo: #fff1e1;
+}
+
+body{
+    color: var(--negroBajo);
+}
+
+*{
+    font-family: "Montserrat", sans-serif;
+    line-height: normal;
+    font-weight: 400;
+    padding: 0px;
+    margin: 0px;
+    position: relative;
+    transition: 0.5s;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+*:hover{
+    transition: 0.5s;
+}
+
+
+li::marker{
+  content: none;
+}
+
+
+
+/* Font Family de la Marca */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+/* CSS BASE */
+
+/* Para activar los font size pasando los 1200px se ajusta su valor mayor, y se unan las media queries para ajustar tamaños reales en mobile
+y desktop */
+
+strong{font-weight: 700;}
+#formulario form {
+    max-width: 690px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    filter: drop-shadow(1px 1px 2px lightgray);
+}
+#formulario button {
+    width: 100%;
+}
+#formulario .terminos {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+#formulario .terminos a {
+    width: auto;
+    padding: 3px 6px;
+    font-size: 12px;
+    background: black;
+    color: white;
+    align-items: center;
+    line-height: normal;
+    border-radius: 5px;
+}
+
+#formulario form .normal, #formulario .seleccion {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+#formulario details div {
+    display: flex;
+    flex-direction: column;
+}
+a.btn{
+    width: fit-content;}
+button{
+    width: fit-content;}
+a.btn, button, label, input, textarea, select, a, .seleccion p, .seleccion details{
+    padding: 10px;
+}
+textarea{
+    margin-top: 7px;
+}
+input, select{
+    margin-top: 5px;
+}
+a.btn, button{
+    text-align: center;
+    border-radius: 5px;
+    border: 0px;
+    display: inline-block;
+}
+
+.fontSizeDesk80Mob36, .fontSizeDesk48Mob32, .fontSizeDesk48Mob28, .fontSizeDesk36Mob28, .fontSizeDesk30Mob24, .fontSizeDesk48Mob48, .fontSizeDesk36Mob36, 
+.fontSizeDesk36Mob32, .fontSizeDesk30Mob28, h1, h2, h3, h4 {
+  font-weight: bold;
+}
+
+
+.fontSizeDesk48Mob48 {
+  font-size: 48px;
+}
+
+.fontSizeDesk36Mob36 {
+  font-size: 36px;
+}
+
+.fontSizeDesk36Mob32 {
+  font-size: clamp(32px, 3vw, 36px);
+}
+
+.fontSizeDesk30Mob28 {
+  font-size: clamp(28px, 2.5vw, 30px);
+}
+
+
+.fontSizeDesk24Mob24 {
+  font-size: 24px;
+}
+
+.fontSizeDesk24Mob20 {
+  font-size: clamp(20px, 2vw, 24px);
+}
+
+.fontSizeDesk20Mob20 {
+  font-size: 20px;
+}
+
+.fontSizeDesk20Mob18 {
+  font-size: clamp(18px,1.5vw + 2px, 20px);
+}
+
+.fontSizeDesk18Mob18 {
+  font-size: 18px;
+}
+
+.fontSizeDesk16Mob16 {
+  font-size: 16px;
+}
+
+.fontSizeDesk14Mob14 {
+  font-size: 14px;
+}
+
+.fontSizeDesk12Mob12 {
+  font-size: 12px;
+}
+
+
+#thankyou article {
+  max-width: 1000px;
+  margin: auto;
+  filter: drop-shadow(2px 4px 2px black);
+}
+
+
+
+
+body#gracias{
+  min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+/* Estilos DESKTOP */
+@media (min-width:768px) {
+  #thankyou{
+    padding:80px 48px 48px;
+  }
+  #formulario form .normal, #formulario .seleccion {
+    max-width: 335px;}
+  .marginDesk0{margin: 0px;}
+  .marginDesk48{margin: 48px;}
+  .marginDeskAuto{margin: auto;}
+  .marginDesk0Auto{margin: 0px auto;}
+  .marginDesk48Auto{margin: 48px auto;}
+  .displayFlexDesk{display: flex;}
+  .flexWrapDesk{flex-wrap: wrap;}
+  .directionRowDesk{flex-direction: row;}
+  .directionColumDesk{flex-direction: column;}
+  .directionRowReverseDesk{flex-direction: row-reverse;}
+  .directionColumReverseDesk{flex-direction: column-reverse;}
+  .fontSizeDesk30Mob24 { font-size: clamp(24px, 2.5vw, 30px); }
+  .fontSizeDesk36Mob28 { font-size: clamp(28px, 3vw, 36px); }
+  .fontSizeDesk48Mob28 { font-size: clamp(28px, 4vw, 48px); }
+  .fontSizeDesk48Mob32 { font-size: clamp(32px, 4vw, 48px); }
+  .fontSizeDesk80Mob36 { font-size: clamp(36px, 6vw + 8px, 80px); }
+  .fontSizeDesk24Mob18 { font-size: clamp(18px, 2vw, 24px); }
+  .fontSizeDesk24Mob16 { font-size: clamp(16px, 2vw, 24px); }
+  .fontSizeDesk20Mob16 { font-size: clamp(16px, 1.5vw + 2px, 20px); }
+  .textCenterDesk{text-align: center;}
+}
+
+.textCenter{text-align: center;}
+.displayFlex{
+  display: flex;
+}
+#textoGracias {
+    max-width: 80%;
+    margin: 40px auto;
+}
+
+#thankyou .home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 48px;
+}
+#thankyou {
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        max-width: 100%;
+}
+header img:hover, footer img:hover, footer .politicas a:hover {
+        transform: scale(1.05);
+        filter: drop-shadow(0px 0px 3px gray);
+    }
+#tituloGracias {
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+#thankyou hr {
+    border-width: 4px;
+    border-style: solid;
+    width: 80%;
+    margin: auto;
+}
+
+
+
+/* Estilos MOBILE */
+@media (max-width:768px) {
+    #thankyou{
+    padding:24px;
+  }
+    #formulario form .normal, #formulario .seleccion {
+    width: 100%;}
+    .textCenterMob{text-align: center;}
+    .marginMobile0{margin: 0px;}
+    .marginMobile48{margin: 48px;}
+    .marginMobileAuto{margin: auto;}
+    .marginMobile0Auto{margin: 0px auto;}
+    .marginMobile48Auto{margin: 48px auto;}
+    .displayFlexMobile{display: flex;}
+    .flexWrapMobile{flex-wrap: wrap;}
+    .directionRowMobile{flex-direction: row;}
+    .directionColumMobile{flex-direction: column;}
+    .directionRowReverseMobile{flex-direction: row-reverse;}
+    .directionColumReverseMobile{flex-direction: column-reverse;}
+  .fontSizeDesk30Mob24 { font-size: 24px; }
+  .fontSizeDesk36Mob28 { font-size: 28px; }
+  .fontSizeDesk48Mob28 { font-size: 28px; }
+  .fontSizeDesk48Mob32 { font-size: 32px; }
+  .fontSizeDesk80Mob36 { font-size: 36px; }
+  .fontSizeDesk24Mob18 { font-size: 18px; }
+  .fontSizeDesk24Mob16 { font-size: 16px; }
+  .fontSizeDesk20Mob16 { font-size: 16px; }
+}
+
+#politicas {
+    padding: 48px;
+    border-bottom: 1px solid white;
+    border-top: 1px solid white;
+    max-width: 100%;
+    margin: auto;
+}
+#politicas li {
+    padding-left: 20px;
+    margin-bottom: 8px;
+}
+#politicas h1{
+  font-size: 48px;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+#politicas h2{
+  font-size: 32px;
+  margin: 40px 10px;
+}
+#politicas p{
+  text-align: justify;
+  margin-bottom: 25px;
+}
+#politicas article{
+  margin-bottom: 48px;
+}
+#politicas a.btn{
+  display: block;
+  margin: auto;
+}
+
+
+/* CSS ANIMACIONES */
+
+/* Animación máquina de escribir */
+@keyframes typewriterBanner {
+  from { width: 0; white-space: nowrap;display: inline-block;overflow: hidden;}
+  to { width: 100%; white-space: nowrap;display: inline-block;overflow: hidden;}
+}
+
+@keyframes blinkCaretBanner {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: transparent; }
+}
+
+/* Efecto para textos 
+#convierteteDistribuidor h1  {
+  white-space: wrap;
+  border-right: 2px solid transparent;
+  animation:
+    typewriterBanner 2.5s steps(30, end),
+    blinkCaretBanner 0.7s step-end infinite;
+}*/
+
+@keyframes aparecerDesdeAbajoBanner {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#convierteteDistribuidor *, #distribuidorOficial *, header, #thankyou * {
+  opacity: 0;
+  animation: aparecerDesdeAbajoBanner 0.8s ease-out forwards;
+}
+
+/* Puedes hacer que los elementos aparezcan en cascada: */
+h1 { animation-delay: 0.2s; }
+h2 { animation-delay: 0.4s; }
+h3 { animation-delay: 0.6s; }
+p  { animation-delay: 0.8s; }
+
+
+
+
+
+
+/* Máquina de escribir */
+@keyframes typewriter {
+  0% {
+    width: 0;display: inline-block;overflow: hidden;white-space: nowrap;
+  }
+  99% {
+    width: 100%;display: inline-block;overflow: hidden;white-space: wrap;
+  }
+  100% {
+    width: 100%;display: inline-block;overflow: hidden;white-space: nowrap;
+  }
+}
+
+@keyframes blinkCaret {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: transparent; }
+}
+
+/* Fade desde abajo (mejorado con escala como mencionaste) */
+@keyframes aparecerDesdeAbajo {
+  from {
+    opacity: 0;
+    transform: translateY(100px) scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+}
+
+/* Fade desde abajo con scroll */
+section h2, section h3, section h4, section p, section li, section span, section label {
+  opacity: 0;
+  transform: translateY(50px) scale(0.4);
+
+  animation-name: aparecerDesdeAbajo;
+  animation-duration: 0.8s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+
+  /* Scroll trigger */
+  view-timeline-name: --reveal-timeline;
+  view-timeline-axis: block;
+  animation-timeline: --reveal-timeline;
+  animation-range: entry 10% cover 20%;
+}
+
+
+
+
+@keyframes imagenDesdeAbajo {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+section img {
+  opacity: 0;
+  transform: translateY(50px) scale(0.8);
+
+  animation-name: imagenDesdeAbajo;
+  animation-duration: 0.8s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+
+  /* Scroll trigger */
+  view-timeline-name: --timelineImagenes;
+  view-timeline-axis: block;
+  animation-timeline: --timelineImagenes;
+  animation-range: entry 5% cover 10%;
+}
+
+section, summary {
+  opacity: 0.7;
+  transform: translateY(20px) scale(0.5);
+
+  animation-name: imagenDesdeAbajo;
+  animation-duration: 0.8s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+
+  /* Scroll trigger */
+  view-timeline-name: --timelineImagenes;
+  view-timeline-axis: block;
+  animation-timeline: --timelineImagenes;
+  animation-range: entry 5% cover 10%;
+}
