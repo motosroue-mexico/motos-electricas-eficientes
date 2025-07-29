@@ -38,10 +38,10 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
     max-width: 50%;
   }
   #mc_embed_signup .mc-field-group{
-    width: 100%;
+    width: 100%!important;
   }
   #mc_embed_signup .mc-field-group{
-    width: 47%;
+    width: 47%!important;
   }
 }
 #convierteteDistribuidor, #respuestasTitulo, #thankyou, #distribuidorOficial, #aprovechaBeneficios, #porqueElegirnos
@@ -332,6 +332,7 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
 @media (min-width:1200px){
     #aprovechaBeneficios{
       padding: 25px 25px 25px 80px;
+      justify-content: space-around;
     }
     #distribuidorOficial img.derecha, #distribuidorOficial img.izquierda{width: 500px;}
     #carruselProductos div {justify-content: center;}
