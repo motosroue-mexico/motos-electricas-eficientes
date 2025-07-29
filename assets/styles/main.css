@@ -25,7 +25,7 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
 #mc_embed_signup h2, #mc_embed_signup .indicates-required {
   width: 100%;
 }
-#mc_embed_signup .mensaje.mc-field-group {
+#aprovechaBeneficios #mc_embed_signup .mc-field-group {
     width: 100%;
 }
 #mc_embed_signup_scroll {
@@ -37,7 +37,7 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
   #formulario {
     max-width: 50%;
   }
-  #mc_embed_signup .mc-field-group{
+  #aprovechaBeneficios #mc_embed_signup .mc-field-group{
     width: 47%;
   }
 }
