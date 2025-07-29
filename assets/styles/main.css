@@ -26,7 +26,7 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
   width: 100%;
 }
 #aprovechaBeneficios #mc_embed_signup .mc-field-group {
-    width: 100%;
+    width: 100%!important;
 }
 #mc_embed_signup_scroll {
   display: flex;
