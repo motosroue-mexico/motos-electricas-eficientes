@@ -1,0 +1,504 @@
+footer a{color:white;display: block;}
+header nav {justify-content: center;align-items: center;margin: 15px 30px;position: relative;gap: 15px;}
+footer h4 {margin: 20px 0px;}
+footer small {display: block;padding: 10px;text-align: center;}
+footer nav {align-items: center;justify-content: space-around;padding: 15px;}
+footer .redesSociales ul {display: flex;align-items: center;justify-content: center;}
+#convierteteDistribuidor {background-image: url(/assets/images/fondoDistribuidor.png);max-width: 100%;}
+#negocioLejos{background-image: url(/assets/images/world.png);max-width: 100%;background-repeat: no-repeat;    }
+#distribuidor {padding: 50px 0px 100px;}
+#distribuidor p:nth-of-type(2){margin: 45px 0px;max-width: 670px;}
+#respuestasTitulo{background-image: url(/assets/images/banner-faq.png);}
+#distribuidorOficial{background-color: var(--azulBajo);}
+#porqueElegirnos{background-color: var(--azulFuerte);    border-top-left-radius: 150px;border-top-right-radius: 150px;}
+#thankyou, #distribuidorOficial{background-image: url(/assets/images/bannerGracias.png);}
+#aprovechaBeneficios{background-image: url(/assets/images/banner-form-dist.png);}
+#porqueElegirnos{
+  background-image: url("/assets/images/porqueElegirnos.png");
+}
+#convierteteDistribuidor, #respuestasTitulo, #thankyou, #distribuidorOficial, #aprovechaBeneficios, #porqueElegirnos
+{background-position: center;background-size: cover;background-repeat: no-repeat;}
+#distribuidor h1{font-weight: 800;}
+#distribuidor a.btn{font-size: 24px;font-weight: 700;margin-top: 90px;padding-left: 20px;padding-right: 20px;}
+#formulario p.CBlanco{font-size: 22px;}
+#formulario h2.CBlanco{font-weight: 800;}
+#lideraMercado > figure > img {width: clamp(350px, 45vw, 816px);height: fit-content;}
+#lideraMercado > figure > figcaption {display: flex;flex-direction: column;gap: 18px;}
+#lideraMercado > figure > figcaption > figure {display: flex;gap: 15px;align-items: center;justify-content: center;}
+#lideraMercado img.CRojoFuerte {border: 1px solid;object-fit: contain;padding: 8px;border-radius: 50%;}
+#lideraMercado figure.displayFlex {align-items: center;justify-content: space-between;}
+#lideraMercado h2 {font-weight: 800;}
+#lideraMercado{max-width: 100%;}
+#negocioLejos h2{font-weight: 800;margin-bottom: 20px;}
+#gamaCompleta h2{font-weight: 800;margin-bottom: 20px;}
+#adaptadoNecesidades h2{font-weight: 800;margin-bottom: 60px;}
+#adaptadoNecesidades h3{font-weight: 900;font-size: 180px;}
+#adaptadoNecesidades h4{font-size: 26px;}
+#adaptadoNecesidades p{font-size: 18px;}
+#adaptadoNecesidades{padding: 100px 25px;}
+#adaptadoNecesidades {max-width: 100%;}
+#adaptadoNecesidades h4, #adaptadoNecesidades p{text-align: center;width: fit-content;}
+#adaptadoNecesidades span, #adaptadoNecesidades h3{width: fit-content;display: block;}
+#adaptadoNecesidades article {display: flex;align-items: baseline;justify-content: space-between;}
+#adaptadoNecesidades article div {display: flex;align-items: center;}
+#adaptadoNecesidades article span
+{height: 250px;display: flex;flex-direction: column;align-items: center;justify-content: space-evenly;margin: 0px 25px;}
+#adaptadoNecesidades h3 {line-height: 1em;position: relative;}
+#respuestasTitulo h2{font-weight: 900;}
+#faqs {display: flex;flex-direction: column;gap: 20px;}
+#faqs summary {padding: 10px;background-color: var(--azulBajo);color: white;border-radius: 6px;cursor: pointer;}
+#faqs summary ~ * {background: var(--azulAlert2);padding: 20px;filter: drop-shadow(2px 4px 6px lightgray);}
+#faqs span {font-weight: 700;font-size: 22px;}
+#faqs li, #faqs p {font-size: 18px;}
+#carruselProductos {margin-top: 48px;}
+#carruselProductos div {display: flex;gap: 20px;align-items: center;}
+#carruselProductos img{flex: 1;object-fit: contain;max-height: 150px;transition: all 0.3s ease;}
+#carruselProductos:hover img:not(:hover) {flex: none;filter: grayscale(100%) brightness(0.7) blur(1px);width: 15%;max-height: 100%;}
+#carruselProductos img:hover {flex: none;max-height: 100%;width: 25%;}
+#carruselProductos:has(img:nth-child(3):hover) img:not(:nth-child(3))
+{flex: none;filter: grayscale(100%) brightness(0.7) blur(1px);width: 10%;}
+
+#carruselProductos img:nth-child(3):hover {flex: none;max-height: 100%;width: 40%;}
+#thankyou img {position: absolute;bottom: 100px;filter: opacity(0.2);z-index: -2;}
+
+
+#distribuidorOficial h1 {
+  margin-bottom: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#distribuidorOficial .info {
+  margin: 35px auto;
+  display: flex;
+  justify-content: space-evenly;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+#distribuidorOficial .info p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#distribuidorOficial .principal {
+  margin-top: 35px;
+  margin-bottom: 35px;
+}
+#distribuidorOficial a.btn, #porqueElegirnos a.btn {
+    margin: auto;
+    display: block;
+    font-weight: 700;
+    width: 320px;
+    border-radius: 10px;
+    position: relative;
+}
+#distribuidorOficial {
+    padding: 55px 25px;
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+#distribuidorOficial a.btn::after, #porqueElegirnos a.btn::after {
+    position: absolute;
+    content: "❮";
+    right: 25px;
+}
+#distribuidorOficial a.btn::before, #porqueElegirnos a.btn::before {
+    position: absolute;
+    content: "❯";
+    left: 25px;
+}
+
+#distribuidorOficial a.btn::after, #porqueElegirnos a.btn::after, #distribuidorOficial a.btn::before, #porqueElegirnos a.btn::before{
+    top: 50%;
+    transform: translate(0px,-50%);
+    font-size: 1.5em;
+    line-height: 1em;
+}
+#distribuidorOficial a.btn, #porqueElegirnos a.btn{
+    font-size: 25px;
+}
+
+#distribuidorOficial .info p::before{
+    content: "✔";
+    color: white;
+}
+#distribuidorOficial img {
+  margin: auto;
+  display: block;
+}
+#distribuidorOficial img.izquierda {
+    left: -20%;
+    top: 20%;
+  }
+  #distribuidorOficial img.derecha {
+    right: -20%;
+    top: 10%;
+}
+#distribuidorOficial img.derecha, #distribuidorOficial img.izquierda{
+  position: absolute;
+  filter: opacity(0.2);
+  z-index: -1;
+}
+
+#aprovechaBeneficios p{
+  margin-bottom: 25px;
+}
+#aprovechaBeneficios h2{
+  margin-top: 20px;
+}
+
+#aprovechaBeneficios{
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+#beneficiosDistribuidor h2{font-weight: 900;letter-spacing: 1px}
+#beneficiosDistribuidor h3{font-weight: 400;}
+
+
+#beneficiosDistribuidor aside{
+  max-width: 575px;
+}
+#beneficiosDistribuidor article{
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+#beneficiosDistribuidor figure {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+
+#beneficiosDistribuidor {
+    display: flex;
+    gap: 20px;
+    margin: 48px;
+    max-width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+#porqueElegirnos .textos div h2{
+  font-size: 108px;
+  line-height: 1em;
+}
+#porqueElegirnos .textos div h2.amplio{
+  font-size: 74px;
+}
+
+#porqueElegirnos .textos p{
+  font-size: 24px;
+  max-width: 250px;
+}
+
+#porqueElegirnos .textos > h2{
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+
+#porqueElegirnos {
+  padding: 200px 0px 0px;
+  display: flex;
+  overflow: hidden;
+  max-width: 100%;
+  justify-content: space-between;
+}
+
+#porqueElegirnos hr{
+  margin: 30px auto;
+  width: 90%;
+  height: 5px;
+  border: 0px;
+}
+#porqueElegirnos .imagenes {
+    position: relative;
+}
+#porqueElegirnos .logo {
+        position: absolute;
+        top: -180px;
+        z-index: -1;
+        filter: brightness(0.5) opacity(0.8);
+    }
+#porqueElegirnos .textos div{
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+#porqueElegirnos a.btn{
+  margin-top: 30px;
+}
+#nuevosProductos .titulos h2.CAzulBajo {
+  font-size: 28px;
+  font-weight: 400;
+}
+#nuevosProductos .titulos h2.CRojoFuerte {
+  font-weight: 700;
+}
+.productosNuevos {
+    display: flex;
+    gap: 15px;
+    padding: 20px 20px 90px;
+    justify-content: center;
+    height: 100%;
+    flex-wrap: wrap;
+}
+.productosNuevos .card {
+    width: 190px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 30px 15px;
+    border-radius: 10px;
+    border-bottom: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    gap: 10px;
+}
+.productosNuevos .card img {
+    object-fit: contain;
+}
+#nuevosProductos .titulos {
+  margin-top: 50px;
+}
+#nuevosProductos .card p{
+  font-weight: 700;
+}
+.productosNuevos h3.BGRojoFuerte {
+  width: fit-content;
+  margin: auto;
+  padding: 2px 15px;
+  position: relative;
+}
+.productosNuevos h3.BGRojoFuerte::after, .productosNuevos h3.BGRojoFuerte::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  background-color: white;
+  height: 24px;
+  width: 12px;
+  top: -1px;
+}
+
+.productosNuevos h3.BGRojoFuerte::after {
+  right: -1px;
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+
+.productosNuevos h3.BGRojoFuerte::before {
+  left: -1px;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+
+
+@media (min-width:1200px){
+    #aprovechaBeneficios{
+      padding: 25px 25px 25px 80px;
+    }
+    #distribuidorOficial img.derecha, #distribuidorOficial img.izquierda{width: 500px;}
+    #carruselProductos div {justify-content: center;}
+    #lideraMercado > figure > figcaption {max-width: 50%;}
+    #lideraMercado > figure > img{max-width: 50%;}
+    #lideraMercado p{max-width: 600px;}
+    #convierteteDistribuidor {padding: 100px 85px 20px;}
+    #thankyou img {width: 300px;left: 200px;}}
+    
+@media (max-width:1200px){
+    #aprovechaBeneficios{padding: 25px;}
+    #distribuidorOficial img.derecha, #distribuidorOficial img.izquierda{width: 200px;}
+    #thankyou img {width: 100px;left: 10px;}
+    #carruselProductos div {justify-content: flex-start;overflow: auto;}
+    #convierteteDistribuidor article {text-align: center;}
+    #convierteteDistribuidor {padding: 50px 20px 20px;}
+    #lideraMercado > figure > figcaption > figure {max-width: 90%;margin: auto;}
+    #lideraMercado > figure > figcaption {max-width: 100%;}
+    #lideraMercado > figure > img{max-width: 100%;}
+    #lideraMercado figure.displayFlex{flex-direction: column-reverse;}}
+
+@media (min-width:900px){
+  #distribuidorOficial img {
+      width: 850px;
+  }
+}
+@media (max-width:900px){
+  #distribuidorOficial img {
+      width: 350px;
+  }
+}
+@media (min-width:1024px){
+  #porqueElegirnos {
+  align-items: flex-end;}
+  #porqueElegirnos .logo{
+    width: 350px;
+    height: auto;
+  }
+  #porqueElegirnos .almacen{
+    width: 550px;
+    height: auto;
+  }
+    #aprovechaBeneficios{justify-content: space-between;}
+    #beneficiosDistribuidor > img {width: 570px;}
+    #adaptadoNecesidades article div {width: 33%;}
+    #adaptadoNecesidades h3 {bottom: -47px;}}
+    
+@media (max-width:1024px){
+  #porqueElegirnos {
+    flex-direction: column;
+    align-items: center;
+  }
+  #porqueElegirnos .imagenes{
+    display: flex;
+    justify-content: center;
+  }
+  #porqueElegirnos .logo{
+    width: 200px;
+    height: auto;
+  }
+  #porqueElegirnos .almacen{
+    width: 100%;
+    height: auto;
+  }
+    #aprovechaBeneficios{justify-content: center;}
+    #beneficiosDistribuidor{
+      flex-wrap: wrap;
+    }
+    #beneficiosDistribuidor > img {width: 350px;    margin: auto;
+    display: block;}
+    #adaptadoNecesidades article div {width: 100%;justify-content: space-between;}
+    #adaptadoNecesidades article {flex-direction: column;}}
+
+@media (min-width:768px){
+  #nuevosProductos .titulos h2.CRojoFuerte {
+    font-size: 50px;
+  }
+  #porqueElegirnos .textos{
+    margin: 0px 20px 80px 100px;
+  }
+  #porqueElegirnos .textos > h2{
+    font-size: 49px;
+  }
+#beneficiosDistribuidor h2{font-size: 62px;}
+#beneficiosDistribuidor h3{font-size: 28px;}
+  #aprovechaBeneficios p{
+    font-size: 22px;
+  }
+  #aprovechaBeneficios h2{
+    font-size: 65px;
+  }
+        #distribuidorOficial .info p::before{
+        font-size: 45px;
+    }
+    #distribuidorOficial h1 {
+    font-size: 50px;
+    max-width: 700px;
+  }
+
+  #distribuidorOficial .titulos p {
+    font-size: 23px;
+  }
+
+  #distribuidorOficial .titulos strong {
+    font-size: 24px;
+  }
+
+  #distribuidorOficial .principal strong {
+    font-size: 26px;
+  }
+
+  #distribuidorOficial .info strong {
+    font-size: 22px;
+  }
+    #tituloGracias {font-size: 100px;margin-bottom: 50px;}
+    #negocioLejos{padding: 160px 60px;}
+    #negocioLejos{background-position: right;background-size: 66%;}
+    #lideraMercado h2 {font-size: 52px;}
+    #formulario h2.CBlanco{font-size: 52px;}
+    #distribuidor p:nth-of-type(1){font-size: 28px;}
+    #distribuidor p:nth-of-type(2){font-size: 22px;}
+    #distribuidor strong{font-size: 24px;}
+    header nav a.btn {position: absolute;right: 0;}
+    #distribuidor h1{font-size: 40px;}
+    #lideraMercado h3 {font-size: 28px;}
+    #lideraMercado p, #lideraMercado strong{font-size: 20px;}
+    #negocioLejos h2{font-size: 52px;max-width: 373px;}
+    #negocioLejos p, #negocioLejos strong{font-size: 21px;}
+    #gamaCompleta h2{font-size: 52px;}
+    #gamaCompleta h3{font-size: 28px;}
+    #adaptadoNecesidades h2{font-size: 53px;}
+    #respuestasTitulo h2{font-size: 60px;max-width: 700px;}
+    #respuestasTitulo{padding: 175px 60px;}}
+
+@media (max-width:768px){
+  #nuevosProductos .titulos h2.CRojoFuerte {
+    font-size: 40px;
+  }
+  #porqueElegirnos .textos div{
+    margin-bottom: 40px;
+  }
+  #porqueElegirnos .textos{
+    margin: 55px auto 80px;
+    display: block;
+  }
+    #porqueElegirnos .textos > h2{
+    font-size: 38px;
+  }
+#beneficiosDistribuidor h2{font-size: 45px;}
+#beneficiosDistribuidor h3{font-size: 20px;}
+  #aprovechaBeneficios p{
+    font-size: 18px;
+  }
+  #aprovechaBeneficios h2{
+    font-size: 50px;
+  }
+    #distribuidorOficial .info p::before{
+        font-size: 25px;
+    }
+    #distribuidorOficial h1 {
+    font-size: 30px;
+  }
+
+  #distribuidorOficial .titulos p {
+    font-size: 18px;
+  }
+
+  #distribuidorOficial .titulos strong {
+    font-size: 18px;
+  }
+
+  #distribuidorOficial .principal strong {
+    font-size: 16px;
+  }
+
+  #distribuidorOficial .info strong {
+    font-size: 15px;
+  }
+    #tituloGracias {font-size: 50px; margin: 100px 0px;}
+    #faqs{ margin: 40px 20px;}
+    #respuestasTitulo{padding: 75px 10px;}
+    #respuestasTitulo h2{font-size: 22px;max-width: 250px;}
+    #adaptadoNecesidades h2{font-size: 22px;}
+    #gamaCompleta {padding: 20px;}
+    #gamaCompleta h2{font-size: 34px;}
+    #gamaCompleta h3{font-size: 22px;}
+    #negocioLejos{padding: 60px 30px 210px 30px;background-position: bottom;background-size: 100%;}
+    #negocioLejos h2{font-size: 25px;max-width: 100%;}
+    #negocioLejos p, #negocioLejos strong{font-size: 18px;}
+    #lideraMercado p, #lideraMercado strong{font-size: 15px;}
+    #lideraMercado h3 {font-size: 20px;}
+    #lideraMercado h2 {font-size: 40px;}
+    #formulario h2.CBlanco{font-size: 35px;}
+    #distribuidor a.btn{margin-left: auto;margin-right: auto;display: block;}
+    #distribuidor h1{font-size: 30px;}
+    #distribuidor p:nth-of-type(1){font-size: 28px;}
+    #distribuidor p:nth-of-type(2){font-size: 22px;}
+    #distribuidor strong{font-size: 24px;}}

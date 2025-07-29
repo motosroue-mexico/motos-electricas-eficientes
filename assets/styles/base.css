@@ -1,0 +1,264 @@
+
+/* Para activar los font size pasando los 1200px se ajusta su valor mayor, y se unan las media queries para ajustar tamaños reales en mobile
+y desktop */
+
+strong{font-weight: 700;}
+#formulario form {
+    max-width: 690px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    filter: drop-shadow(1px 1px 2px lightgray);
+}
+#formulario button {
+    width: 100%;
+}
+#formulario .terminos {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+#formulario .terminos a {
+    width: auto;
+    padding: 3px 6px;
+    font-size: 12px;
+    background: black;
+    color: white;
+    align-items: center;
+    line-height: normal;
+    border-radius: 5px;
+}
+
+#formulario form .normal, #formulario .seleccion {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+#formulario details div {
+    display: flex;
+    flex-direction: column;
+}
+a.btn{
+    width: fit-content;}
+button{
+    width: fit-content;}
+a.btn, button, label, input, textarea, select, a, .seleccion p, .seleccion details{
+    padding: 10px;
+}
+textarea{
+    margin-top: 7px;
+}
+input, select{
+    margin-top: 5px;
+}
+a.btn, button{
+    text-align: center;
+    border-radius: 5px;
+    border: 0px;
+    display: inline-block;
+}
+
+.fontSizeDesk80Mob36, .fontSizeDesk48Mob32, .fontSizeDesk48Mob28, .fontSizeDesk36Mob28, .fontSizeDesk30Mob24, .fontSizeDesk48Mob48, .fontSizeDesk36Mob36, 
+.fontSizeDesk36Mob32, .fontSizeDesk30Mob28, h1, h2, h3, h4 {
+  font-weight: bold;
+}
+
+
+.fontSizeDesk48Mob48 {
+  font-size: 48px;
+}
+
+.fontSizeDesk36Mob36 {
+  font-size: 36px;
+}
+
+.fontSizeDesk36Mob32 {
+  font-size: clamp(32px, 3vw, 36px);
+}
+
+.fontSizeDesk30Mob28 {
+  font-size: clamp(28px, 2.5vw, 30px);
+}
+
+
+.fontSizeDesk24Mob24 {
+  font-size: 24px;
+}
+
+.fontSizeDesk24Mob20 {
+  font-size: clamp(20px, 2vw, 24px);
+}
+
+.fontSizeDesk20Mob20 {
+  font-size: 20px;
+}
+
+.fontSizeDesk20Mob18 {
+  font-size: clamp(18px,1.5vw + 2px, 20px);
+}
+
+.fontSizeDesk18Mob18 {
+  font-size: 18px;
+}
+
+.fontSizeDesk16Mob16 {
+  font-size: 16px;
+}
+
+.fontSizeDesk14Mob14 {
+  font-size: 14px;
+}
+
+.fontSizeDesk12Mob12 {
+  font-size: 12px;
+}
+
+
+#thankyou article {
+  max-width: 1000px;
+  margin: auto;
+  filter: drop-shadow(2px 4px 2px black);
+}
+
+
+
+
+body#gracias{
+  min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+/* Estilos DESKTOP */
+@media (min-width:768px) {
+  #thankyou{
+    padding:80px 48px 48px;
+  }
+  #formulario form .normal, #formulario .seleccion {
+    max-width: 335px;}
+  .marginDesk0{margin: 0px;}
+  .marginDesk48{margin: 48px;}
+  .marginDeskAuto{margin: auto;}
+  .marginDesk0Auto{margin: 0px auto;}
+  .marginDesk48Auto{margin: 48px auto;}
+  .displayFlexDesk{display: flex;}
+  .flexWrapDesk{flex-wrap: wrap;}
+  .directionRowDesk{flex-direction: row;}
+  .directionColumDesk{flex-direction: column;}
+  .directionRowReverseDesk{flex-direction: row-reverse;}
+  .directionColumReverseDesk{flex-direction: column-reverse;}
+  .fontSizeDesk30Mob24 { font-size: clamp(24px, 2.5vw, 30px); }
+  .fontSizeDesk36Mob28 { font-size: clamp(28px, 3vw, 36px); }
+  .fontSizeDesk48Mob28 { font-size: clamp(28px, 4vw, 48px); }
+  .fontSizeDesk48Mob32 { font-size: clamp(32px, 4vw, 48px); }
+  .fontSizeDesk80Mob36 { font-size: clamp(36px, 6vw + 8px, 80px); }
+  .fontSizeDesk24Mob18 { font-size: clamp(18px, 2vw, 24px); }
+  .fontSizeDesk24Mob16 { font-size: clamp(16px, 2vw, 24px); }
+  .fontSizeDesk20Mob16 { font-size: clamp(16px, 1.5vw + 2px, 20px); }
+  .textCenterDesk{text-align: center;}
+}
+
+.textCenter{text-align: center;}
+.displayFlex{
+  display: flex;
+}
+#textoGracias {
+    max-width: 80%;
+    margin: 40px auto;
+}
+
+#thankyou .home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 48px;
+}
+#thankyou {
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        max-width: 100%;
+}
+header img:hover, footer img:hover, footer .politicas a:hover {
+        transform: scale(1.05);
+        filter: drop-shadow(0px 0px 3px gray);
+    }
+#tituloGracias {
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+#thankyou hr {
+    border-width: 4px;
+    border-style: solid;
+    width: 80%;
+    margin: auto;
+}
+
+
+
+/* Estilos MOBILE */
+@media (max-width:768px) {
+    #thankyou{
+    padding:24px;
+  }
+    #formulario form .normal, #formulario .seleccion {
+    width: 100%;}
+    .textCenterMob{text-align: center;}
+    .marginMobile0{margin: 0px;}
+    .marginMobile48{margin: 48px;}
+    .marginMobileAuto{margin: auto;}
+    .marginMobile0Auto{margin: 0px auto;}
+    .marginMobile48Auto{margin: 48px auto;}
+    .displayFlexMobile{display: flex;}
+    .flexWrapMobile{flex-wrap: wrap;}
+    .directionRowMobile{flex-direction: row;}
+    .directionColumMobile{flex-direction: column;}
+    .directionRowReverseMobile{flex-direction: row-reverse;}
+    .directionColumReverseMobile{flex-direction: column-reverse;}
+  .fontSizeDesk30Mob24 { font-size: 24px; }
+  .fontSizeDesk36Mob28 { font-size: 28px; }
+  .fontSizeDesk48Mob28 { font-size: 28px; }
+  .fontSizeDesk48Mob32 { font-size: 32px; }
+  .fontSizeDesk80Mob36 { font-size: 36px; }
+  .fontSizeDesk24Mob18 { font-size: 18px; }
+  .fontSizeDesk24Mob16 { font-size: 16px; }
+  .fontSizeDesk20Mob16 { font-size: 16px; }
+}
+
+#politicas {
+    padding: 48px;
+    border-bottom: 1px solid white;
+    border-top: 1px solid white;
+    max-width: 100%;
+    margin: auto;
+}
+#politicas li {
+    padding-left: 20px;
+    margin-bottom: 8px;
+}
+#politicas h1{
+  font-size: 48px;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+#politicas h2{
+  font-size: 32px;
+  margin: 40px 10px;
+}
+#politicas p{
+  text-align: justify;
+  margin-bottom: 25px;
+}
+#politicas article{
+  margin-bottom: 48px;
+}
+#politicas a.btn{
+  display: block;
+  margin: auto;
+}

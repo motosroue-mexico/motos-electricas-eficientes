@@ -1,0 +1,139 @@
+/* Animación máquina de escribir */
+@keyframes typewriterBanner {
+  from { width: 0; white-space: nowrap;display: inline-block;overflow: hidden;}
+  to { width: 100%; white-space: nowrap;display: inline-block;overflow: hidden;}
+}
+
+@keyframes blinkCaretBanner {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: transparent; }
+}
+
+/* Efecto para textos 
+#convierteteDistribuidor h1  {
+  white-space: wrap;
+  border-right: 2px solid transparent;
+  animation:
+    typewriterBanner 2.5s steps(30, end),
+    blinkCaretBanner 0.7s step-end infinite;
+}*/
+
+@keyframes aparecerDesdeAbajoBanner {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#convierteteDistribuidor *, #distribuidorOficial *, header, #thankyou * {
+  opacity: 0;
+  animation: aparecerDesdeAbajoBanner 0.8s ease-out forwards;
+}
+
+/* Puedes hacer que los elementos aparezcan en cascada: */
+h1 { animation-delay: 0.2s; }
+h2 { animation-delay: 0.4s; }
+h3 { animation-delay: 0.6s; }
+p  { animation-delay: 0.8s; }
+
+
+
+
+
+
+/* Máquina de escribir */
+@keyframes typewriter {
+  0% {
+    width: 0;display: inline-block;overflow: hidden;white-space: nowrap;
+  }
+  99% {
+    width: 100%;display: inline-block;overflow: hidden;white-space: wrap;
+  }
+  100% {
+    width: 100%;display: inline-block;overflow: hidden;white-space: nowrap;
+  }
+}
+
+@keyframes blinkCaret {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: transparent; }
+}
+
+/* Fade desde abajo (mejorado con escala como mencionaste) */
+@keyframes aparecerDesdeAbajo {
+  from {
+    opacity: 0;
+    transform: translateY(100px) scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+}
+
+/* Fade desde abajo con scroll */
+section h2, section h3, section h4, section p, section li, section span, section label {
+  opacity: 0;
+  transform: translateY(50px) scale(0.4);
+
+  animation-name: aparecerDesdeAbajo;
+  animation-duration: 0.8s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+
+  /* Scroll trigger */
+  view-timeline-name: --reveal-timeline;
+  view-timeline-axis: block;
+  animation-timeline: --reveal-timeline;
+  animation-range: entry 10% cover 20%;
+}
+
+
+
+
+@keyframes imagenDesdeAbajo {
+  from {
+    opacity: 0;
+    transform: translateY(100px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+section img {
+  opacity: 0;
+  transform: translateY(50px) scale(0.8);
+
+  animation-name: imagenDesdeAbajo;
+  animation-duration: 0.8s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+
+  /* Scroll trigger */
+  view-timeline-name: --timelineImagenes;
+  view-timeline-axis: block;
+  animation-timeline: --timelineImagenes;
+  animation-range: entry 5% cover 10%;
+}
+
+section, summary {
+  opacity: 0.7;
+  transform: translateY(20px) scale(0.5);
+
+  animation-name: imagenDesdeAbajo;
+  animation-duration: 0.8s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+
+  /* Scroll trigger */
+  view-timeline-name: --timelineImagenes;
+  view-timeline-axis: block;
+  animation-timeline: --timelineImagenes;
+  animation-range: entry 5% cover 10%;
+}
