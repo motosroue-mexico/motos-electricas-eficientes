@@ -40,9 +40,6 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
   #mc_embed_signup .mc-field-group{
     width: 100%!important;
   }
-  #mc_embed_signup .mc-field-group{
-    width: 47%!important;
-  }
 }
 #convierteteDistribuidor, #respuestasTitulo, #thankyou, #distribuidorOficial, #aprovechaBeneficios, #porqueElegirnos
 {background-position: center;background-size: cover;background-repeat: no-repeat;}
