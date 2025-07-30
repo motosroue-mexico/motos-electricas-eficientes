@@ -21,12 +21,19 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
 #mc_embed_signup .clear{
   width: 100%;
 }
+#mc_embed_signup .mc-field-group input{
+  margin-top: 0px!important;
+  padding: 6px!important;
+  border-radius: 5px!important;
+  border: 1px solid black!important;
+}
 #mc_embed_signup .button{
   background-color: var(--azulBajo) !important;
   width: 100% !important;
   font-size: 20px !important;
-    padding: 10px !important;
-    height: auto !important;
+  padding: 10px !important;
+  height: auto !important;
+  margin: 10px 0px 0px !important;
 }
 #mc_embed_signup{
   background: transparent!important;
@@ -760,6 +767,13 @@ li::marker{
 y desktop */
 
 strong{font-weight: 700;}
+
+#mc_embed_signup .mc-field-group label{
+  margin-bottom: 0px!important;
+}
+#mc_embed_signup .mc-field-group {
+  padding-bottom: 0px!important;
+}
 #formulario form {
     display: flex;
     flex-wrap: wrap;
