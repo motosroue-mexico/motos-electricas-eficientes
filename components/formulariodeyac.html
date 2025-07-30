@@ -46,89 +46,75 @@
 </div>
 </div>
 
-
 <script src="https://www.google.com/recaptcha/api.js?render=6Lf6IYsqAAAAAJhaDoHJjVmT7EBejRMo8XHP0ja3"></script>
 <script>
-function onSubmit(token) {
-    handleSubmitForm(token);
-}
-
-function handleSubmitForm(token) {
-    // Obtener los valores de los campos
-    const email = document.getElementById('mce-EMAIL').value.trim();
-    const name = document.getElementById('mce-FNAME').value.trim();
-    const phone = document.getElementById('mce-PHONE').value.trim();
-    const empresa = document.getElementById('mce-EMPRESA').value.trim();
-    const tiponegocio = document.getElementById('mce-TIPONEGDIS').value.trim();
-    const necesitas = document.getElementById('mce-GIRO').value.trim();
-    const invertir = document.getElementById('mce-INVERTIR').value.trim();
-    const direccion = document.getElementById('mce-DIRECCION').value.trim();
-    const ciudad = document.getElementById('mce-CIUDAD').value.trim();
-    const estado = document.getElementById('mce-ESTADO').value.trim();
-
-    // Validación básica
-    if (!email || !name || !phone || !empresa || !tiponegocio || !necesitas || !invertir || !direccion || !ciudad || !estado) {
-        alert("Por favor, completa todos los campos obligatorios.");
-        return;
-    }
-
-    // Enviar a Google Sheets
-    const googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbzI7qMLv9Mi7RJjA7ZdADekNwNufkFJlRsHLOxC7IbJA2NHSHq1xHkhNeH6uwlWuojyFw/exec';
-
-    fetch(googleSheetsUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            email, name, phone, empresa, tiponegocio,
-            necesitas, invertir, direccion, ciudad, estado, token
-        })
-    })
-    .then(response => {
-        if (!response.ok) throw new Error("Error en Google Sheets");
-        return response.text();
-    })
-    .then(data => {
-        console.log("✅ Enviado a Google Sheets:", data);
-
-        // Enviar a Mailchimp
-        const mailchimpUrl = 'https://deyac.us14.list-manage.com/subscribe/post?u=9534a6efd315bd626253692ec&id=02f9c801cb&f_id=001e8de0f0';
-
-        const formData = new FormData();
-        formData.append('EMAIL', email);
-        formData.append('FNAME', name);
-        formData.append('PHONE', phone);
-        formData.append('EMPRESA', empresa);
-        formData.append('TIPONEGDIS', tiponegocio);
-        formData.append('GIRO', necesitas);
-        formData.append('INVERTIR', invertir);
-        formData.append('DIRECCION', direccion);
-        formData.append('CIUDAD', ciudad);
-        formData.append('ESTADO', estado);
-        formData.append('tags', '8101822');
-
-        fetch(mailchimpUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: formData
-        });
-
-        alert("Formulario enviado correctamente.");
-    })
-    .catch(err => {
-        console.error("❌ Error:", err);
-        alert("Hubo un problema al enviar el formulario. Intenta nuevamente.");
-    });
-}
-
-// Interceptar envío del formulario
 document.getElementById('mc-embedded-subscribe-form').addEventListener('submit', function (event) {
-    event.preventDefault();
-    grecaptcha.ready(function () {
-        grecaptcha.execute('6Lf6IYsqAAAAAJhaDoHJjVmT7EBejRMo8XHP0ja3', { action: 'submit' }).then(function (token) {
-            handleSubmitForm(token);
-        });
+  event.preventDefault();
+
+  grecaptcha.ready(function () {
+    grecaptcha.execute('6Lf6IYsqAAAAAJhaDoHJjVmT7EBejRMo8XHP0ja3', { action: 'submit' }).then(function (token) {
+      enviarFormulario(token);
     });
+  });
 });
+
+function enviarFormulario(token) {
+  const email = document.getElementById('mce-EMAIL').value.trim();
+  const name = document.getElementById('mce-FNAME').value.trim();
+  const phone = document.getElementById('mce-PHONE').value.trim();
+  const empresa = document.getElementById('mce-EMPRESA').value.trim();
+  const tiponegocio = document.getElementById('mce-TIPONEGDIS').value.trim();
+  const necesitas = document.getElementById('mce-GIRO').value.trim();
+  const invertir = document.getElementById('mce-INVERTIR').value.trim();
+  const direccion = document.getElementById('mce-DIRECCION').value.trim();
+  const ciudad = document.getElementById('mce-CIUDAD').value.trim();
+  const estado = document.getElementById('mce-ESTADO').value.trim();
+
+  if (!email || !name || !phone || !empresa || !tiponegocio || !necesitas || !invertir || !direccion || !ciudad || !estado) {
+    alert("Por favor completa todos los campos requeridos.");
+    return;
+  }
+
+  // 1. Enviar a Google Sheets
+  const googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbzI7qMLv9Mi7RJjA7ZdADekNwNufkFJlRsHLOxC7IbJA2NHSHq1xHkhNeH6uwlWuojyFw/exec';
+
+  fetch(googleSheetsUrl, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: new URLSearchParams({
+      email, name, phone, empresa, tiponegocio, necesitas,
+      invertir, direccion, ciudad, estado, token
+    })
+  })
+  .then(() => {
+    console.log("✅ Datos enviados a Google Sheets");
+
+    // 2. Enviar a Mailchimp
+    const mailchimpUrl = 'https://deyac.us14.list-manage.com/subscribe/post?u=9534a6efd315bd626253692ec&id=02f9c801cb&f_id=001e8de0f0';
+    const formData = new FormData();
+    formData.append('EMAIL', email);
+    formData.append('FNAME', name);
+    formData.append('PHONE', phone);
+    formData.append('EMPRESA', empresa);
+    formData.append('TIPONEGDIS', tiponegocio);
+    formData.append('GIRO', necesitas);
+    formData.append('INVERTIR', invertir);
+    formData.append('DIRECCION', direccion);
+    formData.append('CIUDAD', ciudad);
+    formData.append('ESTADO', estado);
+    formData.append('tags', '8101822');
+
+    fetch(mailchimpUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: formData
+    });
+
+    alert("Formulario enviado correctamente. Gracias por registrarte.");
+  })
+  .catch((error) => {
+    console.error("❌ Error en el envío:", error);
+    alert("Hubo un problema al enviar el formulario. Intenta más tarde.");
+  });
+}
 </script>
