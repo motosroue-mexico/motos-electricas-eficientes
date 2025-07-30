@@ -6,7 +6,8 @@
            We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
 </style>
 <div id="mc_embed_signup">
-    <form action="https://deyac.us14.list-manage.com/subscribe/post?u=9534a6efd315bd626253692ec&id=02f9c801cb&f_id=001e8de0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_self" novalidate="">
+<form id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" novalidate>
+
         <div id="mc_embed_signup_scroll"><h2>Formulario de registro</h2>
             <div class="indicates-required"><span class="asterisk">*</span> indica que es obligatorio</div>
           <div class="mc-field-group mitad"><label for="mce-EMAIL">Dirección de correo electrónico <span class="asterisk">*</span></label><input type="email" name="EMAIL" class="required email" id="mce-EMAIL" required="" value=""></div>
@@ -44,78 +45,90 @@
 </form>
 </div>
 </div>
+
+
+<script src="https://www.google.com/recaptcha/api.js?render=6Lf6IYsqAAAAAJhaDoHJjVmT7EBejRMo8XHP0ja3"></script>
 <script>
-// Función que se llama cuando el reCAPTCHA se completa
 function onSubmit(token) {
-    // Llamar a la función que maneja el envío del formulario
     handleSubmitForm(token);
 }
-// Manejar el envío del formulario
+
 function handleSubmitForm(token) {
-    // Prevenir el comportamiento por defecto del formulario
-    // event.preventDefault();
-    // Obtener los valores de los campos del formulario
-    var email = document.getElementById('mce-EMAIL').value;
-    var name = document.getElementById('mce-FNAME').value;
-    var phone = document.getElementById('mce-PHONE').value;
-    var empresa = document.getElementById('mce-EMPRESA').value;
-    var tiponegocio = document.getElementById('mce-TIPONEGDIS').value;
-    var necesitas = document.getElementById('mce-GIRO').value;
-    var invertir = document.getElementById('mce-INVERTIR').value;
-    var direccion = document.getElementById('mce-DIRECCION').value;
-    var ciudad = document.getElementById('mce-CIUDAD').value;
-    var estado = document.getElementById('mce-ESTADO').value;
-     // Validar que todos los campos requeridos tengan información
- if (!email || !name || !phone ||!empresa ||!tiponegocio || !necesitas || !invertir || !direccion|| !ciudad|| !estado) {
-console.error('Por favor completa todos los campos requeridos.');
-alert('Por favor, completa todos los campos antes de enviar el formulario.');
-return; // Detener el envío si falta información
-}  
-    // URL de Google Apps Script (Asegúrate de usar la URL correcta)
-    var googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbzI7qMLv9Mi7RJjA7ZdADekNwNufkFJlRsHLOxC7IbJA2NHSHq1xHkhNeH6uwlWuojyFw/exec';
-    // Enviar los datos a Google Sheets
+    // Obtener los valores de los campos
+    const email = document.getElementById('mce-EMAIL').value.trim();
+    const name = document.getElementById('mce-FNAME').value.trim();
+    const phone = document.getElementById('mce-PHONE').value.trim();
+    const empresa = document.getElementById('mce-EMPRESA').value.trim();
+    const tiponegocio = document.getElementById('mce-TIPONEGDIS').value.trim();
+    const necesitas = document.getElementById('mce-GIRO').value.trim();
+    const invertir = document.getElementById('mce-INVERTIR').value.trim();
+    const direccion = document.getElementById('mce-DIRECCION').value.trim();
+    const ciudad = document.getElementById('mce-CIUDAD').value.trim();
+    const estado = document.getElementById('mce-ESTADO').value.trim();
+
+    // Validación básica
+    if (!email || !name || !phone || !empresa || !tiponegocio || !necesitas || !invertir || !direccion || !ciudad || !estado) {
+        alert("Por favor, completa todos los campos obligatorios.");
+        return;
+    }
+
+    // Enviar a Google Sheets
+    const googleSheetsUrl = 'https://script.google.com/macros/s/AKfycbzI7qMLv9Mi7RJjA7ZdADekNwNufkFJlRsHLOxC7IbJA2NHSHq1xHkhNeH6uwlWuojyFw/exec';
+
     fetch(googleSheetsUrl, {
         method: 'POST',
-        body: new URLSearchParams({
-            email: email,
-            name: name,
-            phone: phone,
-            empresa: empresa,
-            tiponegocio: tiponegocio,
-            necesitas: necesitas,
-            invertir: invertir,
-            direccion: direccion,
-            ciudad: ciudad,
-            estado: estado,
-        }),
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
+        body: new URLSearchParams({
+            email, name, phone, empresa, tiponegocio,
+            necesitas, invertir, direccion, ciudad, estado, token
+        })
     })
-        .then((response) => {
-            if (!response.ok) {
-                console.error("Error al enviar a Google Sheets:", response.statusText);
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.text();
-        })
-        .then((data) => {
-            console.log('Respuesta de Google Sheets:', data);
-            // Después de que Google Sheets reciba los datos, enviamos el formulario a Mailchimp
-            document.getElementById('mc-embedded-subscribe-form').submit();
-        })
-        .catch((error) => {
-            console.error('Error en la solicitud a Google Sheets:', error);
+    .then(response => {
+        if (!response.ok) throw new Error("Error en Google Sheets");
+        return response.text();
+    })
+    .then(data => {
+        console.log("✅ Enviado a Google Sheets:", data);
+
+        // Enviar a Mailchimp
+        const mailchimpUrl = 'https://deyac.us14.list-manage.com/subscribe/post?u=9534a6efd315bd626253692ec&id=02f9c801cb&f_id=001e8de0f0';
+
+        const formData = new FormData();
+        formData.append('EMAIL', email);
+        formData.append('FNAME', name);
+        formData.append('PHONE', phone);
+        formData.append('EMPRESA', empresa);
+        formData.append('TIPONEGDIS', tiponegocio);
+        formData.append('GIRO', necesitas);
+        formData.append('INVERTIR', invertir);
+        formData.append('DIRECCION', direccion);
+        formData.append('CIUDAD', ciudad);
+        formData.append('ESTADO', estado);
+        formData.append('tags', '8101822');
+
+        fetch(mailchimpUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: formData
         });
+
+        alert("Formulario enviado correctamente.");
+    })
+    .catch(err => {
+        console.error("❌ Error:", err);
+        alert("Hubo un problema al enviar el formulario. Intenta nuevamente.");
+    });
 }
-// Opción adicional: si prefieres usar el botón sin reCAPTCHA explícito en el HTML
-document.getElementById('mc-embedded-subscribe-form').addEventListener('submit', function(event) {
+
+// Interceptar envío del formulario
+document.getElementById('mc-embedded-subscribe-form').addEventListener('submit', function (event) {
     event.preventDefault();
-    grecaptcha.ready(function() {
-        grecaptcha.execute('6Lf6IYsqAAAAAJhaDoHJjVmT7EBejRMo8XHP0ja3', { action: 'submit' }).then(function(token) {
-            // Llamar a la función para manejar el formulario después de completar reCAPTCHA
+    grecaptcha.ready(function () {
+        grecaptcha.execute('6Lf6IYsqAAAAAJhaDoHJjVmT7EBejRMo8XHP0ja3', { action: 'submit' }).then(function (token) {
             handleSubmitForm(token);
         });
     });
 });
-  </script>
+</script>
