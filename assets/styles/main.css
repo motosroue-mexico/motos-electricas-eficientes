@@ -31,7 +31,7 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
 #mc_embed_signup .mc-field-group select{
   width: auto!important;
 }
-select#mce-INTERESADO {
+#mc_embed_signup .mc-field-group  select#mce-INTERESADO {
     width: 100%!important;
 }
 #mc_embed_signup .button{
