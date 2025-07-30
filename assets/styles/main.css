@@ -26,6 +26,7 @@ footer .redesSociales ul {display: flex;align-items: center;justify-content: cen
   padding: 6px!important;
   border-radius: 5px!important;
   border: 1px solid black!important;
+  width: fit-content!important;
 }
 #mc_embed_signup .button{
   background-color: var(--azulBajo) !important;
