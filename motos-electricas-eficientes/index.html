@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Title  -->
+  <title>ROUE E-Motos</title>
+  <!-- Descripción -->
+  <meta name="description" content="ROUE Motos ofrece una oportunidad única para concesionarios y distribuidores que buscan expandir su catálogo con una opción sostenible y de calidad." />
+  <!-- Favicon -->
+  <link rel="icon" type="image/webp" href="/assets/images/favicon.webp" />
+  <!-- Estilos base -->
+  <link rel="stylesheet" href="/assets/styles/main.css" />
+
+</head>
+
+<!-- Versón index.html -->
+  <header id="header-container"></header>
+  <main id="main-content">
+    <section id="principal"></section>
+    <section id="carruselMotos"></section>
+    <section id="formulario"></section>
+    <section id="colores"></section>
+    <section id="elegir-roue"></section>
+    <section id="ventajas"></section>
+    <section id="beneficios"></section>
+    <section id="tranquilidad" class="BGGrisMedio"></section>
+    <section id="comprar" class="BGBlanco"></section>
+  </main>
+  <footer id="footer-container"></footer>
+  <a href="https://api.whatsapp.com/send?phone=5214441953225&amp;text=%C2%A1Hola!%20Estoy%20interesado%20en%20m%C3%A1s%20informaci%C3%B3n%20de%20Motos%20ROUE." class="whats-contact" target="_blank">
+  <img width="40" alt="logo whats" src="//www.motosroue.mx/hosted/images/11/ab976c33f94be485cdb26f0f5a17d4/whatsapp.png">
+  </a>
+
+<script defer>
+  // Carga un componente y avisa cuando está listo
+  async function loadComponent(id, file) {
+    try {
+      const res = await fetch(file);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const html = await res.text();
+      const el = document.getElementById(id);
+      if (el) {
+        el.innerHTML = html;
+
+        // 👉 si es #comprar y ya existe la función, móntalo en el acto
+        if (id === 'comprar' && typeof window.mountComprarCarousel === 'function') {
+          window.mountComprarCarousel();
+        }
+
+        // evento informativo (por si otros scripts lo usan)
+        document.dispatchEvent(new CustomEvent('component:ready', { detail: { id } }));
+      }
+      console.log(`✅ ${file} cargado correctamente en #${id}`);
+    } catch (err) {
+      console.error(`❌ Error cargando ${file} en #${id}:`, err);
+    }
+  }
+
+  // Orden exacto de carga
+  const components = [
+    { id: 'header-container', file: '/components/header.html' },
+    { id: 'principal', file: '/components/principal.html' },
+    { id: 'carruselMotos', file: '/components/carruselMotos.html' },
+    { id: 'formulario', file: '/components/formulario.html' },
+    { id: 'colores', file: '/components/colores.html' },
+    { id: 'elegir-roue', file: '/components/elegir-roue.html' },
+    { id: 'ventajas', file: '/components/ventajas.html' },
+    { id: 'beneficios', file: '/components/beneficios.html' },
+    { id: 'tranquilidad', file: '/components/tranquilidad.html' },
+    { id: 'comprar', file: '/components/comprar.html' },
+    { id: 'footer-container', file: '/components/footer.html' },
+  ];
+
+  // Cargar en serie (uno tras otro)
+  window.addEventListener('DOMContentLoaded', async () => {
+    for (const { id, file } of components) {
+      await loadComponent(id, file);
+    }
+    document.dispatchEvent(new CustomEvent('components:all-ready'));
+  });
+</script>
+
+
+
+
+<script defer src="/assets/scripts/comprar-carrusel.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Permite acceso a archivos o carpetas reales
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Redirige URLs limpias a /index.html dentro de carpetas (solo si no es archivo o dir)
+RewriteRule ^(.+?)/?$ $1/index.html [L]
