@@ -1,4 +1,22 @@
 /* CSS PERSONALIZADO */
+
+
+#thankyou {
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+    min-height: 100%;
+    gap: 20px;
+    padding: 40px;
+}
+
+#gracias {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 #comprar article::-webkit-scrollbar {
         display: none;
 }
