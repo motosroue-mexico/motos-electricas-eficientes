@@ -1,6 +1,8 @@
 /* CSS PERSONALIZADO */
 
-
+#carruselMotos img.motos {
+    object-fit: contain;
+}
 #thankyou {
     flex-direction: column;
     align-items: center;
@@ -1100,12 +1102,6 @@ textarea {
 ul {
     padding: 0px;
 }
-@font-face {
-    font-family: 'PFBaselinePro';
-    src: url('/assets/PFBaselinePro.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
 
 
 section.bannerPrincipal {
@@ -1218,6 +1214,7 @@ input:focus, select:focus, textarea:focus {
   src: url('/assets/Arimo-VariableFont_wght.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -1225,6 +1222,7 @@ input:focus, select:focus, textarea:focus {
   src: url('/assets/PFBaselinePro-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 
