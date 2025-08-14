@@ -308,7 +308,6 @@ footer small {
     width: 100%;
     display: block;
     padding-bottom: 24px;
-    font-family: 'PFBaselinePro';
 }
 footer ul {
     display: flex;
@@ -363,9 +362,9 @@ footer nav {
     flex-direction: column;
     gap: 10px;
 }
+
 #tranquilidad p{
     font-size: 18px;
-    font-family: "PFBaselinePro", sans-serif;
     position: relative;
     padding-left: 15px;
 }
@@ -1161,8 +1160,11 @@ body{
     background-color: var(--negro);
 }
 
+footer small, #tranquilidad p, h1, h2, h3, h4 {
+    font-family:'PFBaselinePro', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif
+}
+
 h1, h2, h3, h4{
-    font-family: "PFBaselinePro", sans-serif;
     font-weight: 700;
 }
 li {
@@ -1212,17 +1214,13 @@ input:focus, select:focus, textarea:focus {
 @font-face {
   font-family: 'Arimo';
   src: url('/assets/Arimo-VariableFont_wght.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+  font-weight: normal;font-style: normal;font-display: swap;
 }
 
 @font-face {
   font-family: 'PFBaselinePro';
   src: url('/assets/PFBaselinePro-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+  font-weight: normal;font-style: normal;font-display: swap;
 }
 
 
