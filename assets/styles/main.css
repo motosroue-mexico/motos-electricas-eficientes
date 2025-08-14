@@ -1,5 +1,25 @@
 /* CSS PERSONALIZADO */
 
+@font-face {
+  font-family: 'Arimo';
+  src: url('/assets/Arimo-VariableFont_wght.ttf') format('truetype');
+  font-weight: normal;font-style: normal;font-display: swap;
+}
+
+@font-face {
+  font-family: 'PFBaselinePro';
+  src: url('/assets/PFBaselinePro-Regular.ttf') format('truetype');
+  font-weight: normal;font-style: normal;font-display: swap;
+}
+
+body{font-family:'Arimo', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif}
+
+footer small, #tranquilidad p, h1, h2, h3, h4 {
+    font-family:'PFBaselinePro', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif
+}
+
+
+
 #carruselMotos img.motos {
     object-fit: contain;
 }
@@ -1154,15 +1174,11 @@ body, p{
     font-size: 22px; /**/
 }
 body{
-    font-family: "Arimo", sans-serif;
     color: var(--negroFuerte);
     position: relative;
     background-color: var(--negro);
 }
 
-footer small, #tranquilidad p, h1, h2, h3, h4 {
-    font-family:'PFBaselinePro', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif
-}
 
 h1, h2, h3, h4{
     font-weight: 700;
@@ -1210,20 +1226,6 @@ input:focus, select:focus, textarea:focus {
     outline: 1px solid var(--azulAlert1);
     color: var(--negroBajo);
 }
-
-@font-face {
-  font-family: 'Arimo';
-  src: url('/assets/Arimo-VariableFont_wght.ttf') format('truetype');
-  font-weight: normal;font-style: normal;font-display: swap;
-}
-
-@font-face {
-  font-family: 'PFBaselinePro';
-  src: url('/assets/PFBaselinePro-Regular.ttf') format('truetype');
-  font-weight: normal;font-style: normal;font-display: swap;
-}
-
-
 
 .CNegro { color: var(--negroFuerte); }
 .BGNegro { background-color: var(--negroFuerte); }
