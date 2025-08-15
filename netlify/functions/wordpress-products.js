@@ -1,8 +1,6 @@
-// netlify/functions/wordpress-products.js
 'use strict';
 
-// const SITE = process.env.WOO_SITE;
-const SITE = 'https://motosroue.com.mx';
+const SITE = process.env.WOO_SITE;
 const CK   = process.env.WOO_CK;
 const CS   = process.env.WOO_CS;
 
@@ -10,9 +8,7 @@ const PER_PAGE_DEFAULT = 100;
 const ACF_KEYS = ['imagen-landing', 'nombre-landing'];
 const MEDIA_ACF_KEYS = new Set(['imagen-landing']);
 
-if (!SITE || !CK || !CS) {
-  console.error('Faltan WOO_SITE / WOO_CK / WOO_CS');
-}
+if (!SITE || !CK || !CS) console.error('Faltan WOO_SITE / WOO_CK / WOO_CS');
 
 const base = SITE ? SITE.replace(/\/$/, '') : '';
 const authHeader = { Authorization: 'Basic ' + Buffer.from(`${CK}:${CS}`).toString('base64') };
@@ -57,8 +53,7 @@ async function fetchMediaMap(ids){
     const url=`${base}/wp-json/wp/v2/media?`+params.toString();
     const res=await fetch(url,{ headers:authHeader });
     if (!res.ok) throw new Error(`Media ${res.status} - ${await res.text().catch(()=> '')}`);
-    const items=await res.json();
-    for (const m of items) map.set(Number(m.id), m);
+    const items=await res.json(); for (const m of items) map.set(Number(m.id), m);
   } return map;
 }
 
@@ -85,11 +80,15 @@ function shapeProduct(p, mediaMap){
 }
 
 exports.handler = async (event) => {
+  // CORS
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode:204, headers:{ 'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,OPTIONS','Access-Control-Allow-Headers':'Content-Type' } };
+    return { statusCode:204, headers:{
+      'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,OPTIONS','Access-Control-Allow-Headers':'Content-Type'
+    }};
   }
   if (!SITE || !CK || !CS) {
-    return { statusCode:500, headers:{'Content-Type':'application/json; charset=utf-8','Access-Control-Allow-Origin':'*'}, body: JSON.stringify({ error:'Faltan WOO_* env vars' }) };
+    return { statusCode:500, headers:{'Content-Type':'application/json; charset=utf-8','Access-Control-Allow-Origin':'*'},
+      body: JSON.stringify({ error:'Faltan WOO_* env vars' }) };
   }
 
   try {
