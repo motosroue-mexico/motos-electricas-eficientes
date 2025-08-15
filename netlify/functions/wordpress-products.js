@@ -1,7 +1,8 @@
 // netlify/functions/wordpress-products.js
 'use strict';
 
-const SITE = process.env.WOO_SITE;
+// const SITE = process.env.WOO_SITE;
+const SITE = 'https://motosroue.com.mx';
 const CK   = process.env.WOO_CK;
 const CS   = process.env.WOO_CS;
 
