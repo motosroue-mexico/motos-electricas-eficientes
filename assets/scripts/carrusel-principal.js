@@ -1,9 +1,8 @@
-
 (() => {
   let started = false;
 
   async function run() {
-    if (started) return; // evita doble ejecución
+    if (started) return;
     started = true;
 
     try {
@@ -30,9 +29,8 @@
     }
   }
 
-  // 1) cuando tu loader termine TODOS los componentes
+  // cuando tu loader termine TODOS los componentes
   document.addEventListener('components:all-ready', run, { once: true });
-
-  // 2) fallback: cuando la página completa (incl. imágenes) haya cargado
+  // fallback por si acaso
   window.addEventListener('load', run, { once: true });
 })();
