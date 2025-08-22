@@ -104,6 +104,13 @@
     });
   }
 
+  // Ejecuta cuando el DOM esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+
+  // Y también cuando tu orquestador de componentes avise
   document.addEventListener('components:all-ready', init, { once: true });
-  window.addEventListener('load', init, { once: true });
 })();
