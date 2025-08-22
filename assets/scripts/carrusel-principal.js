@@ -2,76 +2,53 @@
 (() => {
   let started = false;
 
-  async function run() {
-    if (started) return;
-    started = true;
-    try {
-      const ENDPOINT = '/.netlify/functions/wordpress-products?status=publish&all=1';
-      const res  = await fetch(ENDPOINT, { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-
-      const data = await res.json();
-      localStorage.setItem('woo:products', JSON.stringify(data));
-      localStorage.setItem('woo:products:ts', String(Date.now()));
-      console.log('Productos guardados en localStorage:', data);
-
-      document.dispatchEvent(new CustomEvent('woo:products:ready', { detail: data }));
-    } catch (e) {
-      console.error('Error trayendo productos:', e);
-      const cached = localStorage.getItem('woo:products');
-      if (cached) {
-        const data = JSON.parse(cached);
-        console.warn('Usando cache previo de localStorage');
-        document.dispatchEvent(new CustomEvent('woo:products:ready', { detail: data }));
-      }
-    }
+  // Helpers de selección (rebuscan por si el HTML se montó tarde)
+  function getRefs() {
+    const root = document.getElementById('carruselMotos');
+    if (!root) return {};
+    return {
+      root,
+      img: root.querySelector('img.motos'),
+      h2:  root.querySelector('h2'),
+    };
   }
 
-  // corre al final de tu loader y, por si acaso, al load
-  document.addEventListener('components:all-ready', run, { once: true });
-  window.addEventListener('load', run, { once: true });
-})();
-
-
-
-(() => {
-  let started = false;
+  // Lectura inicial del cache
+  function readProductsFromCache() {
+    try {
+      const cached = localStorage.getItem('woo:products');
+      if (!cached) return [];
+      const arr = JSON.parse(cached);
+      return Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
+    } catch {
+      return [];
+    }
+  }
 
   function init() {
     if (started) return;
     started = true;
 
-    const root   = document.getElementById('carruselMotos');
-    const img    = root?.querySelector('img.motos');
-    const h2     = root?.querySelector('h2');
-    const btnDer = document.getElementById('motoDer');
-    const btnIzq = document.getElementById('motoIzq');
-    if (!root || !img || !h2 || !btnDer || !btnIzq) return;
+    let products = readProductsFromCache();
 
-    let products = [];
+    // Mantener XFX hasta primer click
+    const { root } = getRefs();
+    if (root && !root.dataset.idx) root.dataset.idx = '-1';
 
-    // Carga inicial desde localStorage (sin tocar tu fetch)
-    try {
-      const cached = localStorage.getItem('woo:products');
-      if (cached) {
-        const arr = JSON.parse(cached);
-        products = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
-      }
-    } catch (_) {}
-
-    // Mantén la XFX inicial: primer click -> primer producto
-    if (!root.dataset.idx) root.dataset.idx = '-1';
-
-    const pickSrc = (p) =>
+    const pickSrc = p =>
       p?.acf?.['imagen-landing']?.url ||
       p?.acf?.['imagen-landing'] ||
       p?.image || '';
 
-    const pickTitle = (p) =>
+    const pickTitle = p =>
       p?.acf?.['nombre-landing'] || p?.name || '';
 
     function renderByIndex(nextIndex) {
       if (!products.length) return;
+
+      const { root, img, h2 } = getRefs();
+      if (!root || !img || !h2) return;
+
       const len = products.length;
       const i = ((nextIndex % len) + len) % len;
       const p = products[i];
@@ -86,31 +63,61 @@
         img.title = ttl;
       }
       root.dataset.idx = String(i);
+
+      // Precarga siguiente
+      const next = products[(i + 1) % len];
+      const pre = pickSrc(next);
+      if (pre) { const im = new Image(); im.src = pre; }
     }
 
     function move(delta) {
       if (!products.length) return;
-      const current = parseInt(root.dataset.idx || '-1', 10) || 0;
-      renderByIndex(current + delta);
+      const { root } = getRefs();
+      if (!root) return;
+      const current = parseInt(root.dataset.idx ?? '-1', 10);
+      renderByIndex((Number.isNaN(current) ? -1 : current) + delta);
     }
 
-    btnDer.addEventListener('click', () => move(1));
-    btnIzq.addEventListener('click', () => move(-1));
+    // Delegación de eventos para que funcione aunque el DOM cambie
+    document.addEventListener('click', (e) => {
+      const der = e.target.closest('#motoDer');
+      const izq = e.target.closest('#motoIzq');
+      if (!der && !izq) return;
 
-    // Actualiza la lista cuando llegue el evento de tu fetch (sin render inmediato)
-    document.addEventListener('woo:products:ready', (e) => {
-      const arr = e?.detail;
-      products = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
+      // Evita navegación si son <a>
+      e.preventDefault();
+      e.stopPropagation();
+
+      // No intentes mover si aún no hay productos
+      if (!products.length) return;
+
+      if (der) move(1);
+      else if (izq) move(-1);
     });
+
+    // Actualiza productos cuando llegue tu evento
+    document.addEventListener('woo:products:ready', (ev) => {
+      const arr = ev?.detail;
+      products = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
+      // No render aquí: mantenemos XFX hasta que el usuario haga click
+    }, { once: false });
+
+    // Por si el HTML de #carruselMotos se inserta tarde, ajusta idx cuando exista
+    if (!root) {
+      const mo = new MutationObserver(() => {
+        const { root } = getRefs();
+        if (root && !root.dataset.idx) root.dataset.idx = '-1';
+      });
+      mo.observe(document.documentElement, { childList: true, subtree: true });
+      // El observer puede quedarse; es barato y solo setea data-idx si falta.
+    }
   }
 
-  // Ejecuta cuando el DOM esté listo
+  // Inicia cuando el DOM esté listo y también cuando tu loader lo indique
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
     init();
   }
-
-  // Y también cuando tu orquestador de componentes avise
   document.addEventListener('components:all-ready', init, { once: true });
 })();
