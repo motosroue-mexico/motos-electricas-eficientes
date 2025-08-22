@@ -1,6 +1,6 @@
-
 (() => {
   let started = false;
+  let observersReady = false;
 
   // Helpers de selección (rebuscan por si el HTML se montó tarde)
   function getRefs() {
@@ -10,6 +10,7 @@
       root,
       img: root.querySelector('img.motos'),
       h2:  root.querySelector('h2'),
+      box: root.querySelector('figcaption') || root, // contenedor para ajustar el texto
     };
   }
 
@@ -25,6 +26,59 @@
     }
   }
 
+  // ---- Auto-fit SOLO JS (búsqueda binaria de font-size) ----
+  function fitText(h2, box, { min = 14, max = 64, precision = 0.5 } = {}) {
+    if (!h2 || !box) return;
+
+    // Ajustes para evitar desbordes
+    h2.style.whiteSpace = 'normal';
+    h2.style.wordBreak  = 'break-word';
+    h2.style.hyphens    = 'auto';
+    h2.style.lineHeight = '1.05';
+
+    const fits = () =>
+      h2.scrollWidth <= box.clientWidth && h2.scrollHeight <= box.clientHeight;
+
+    // Usa como tope el font-size actual si es mayor/menor que el rango
+    const computed = parseFloat(getComputedStyle(h2).fontSize) || max;
+    max = Math.max(min, Math.min(max, Math.round(computed)));
+
+    h2.style.fontSize = max + 'px';
+    if (fits()) return;
+
+    let lo = min, hi = max;
+    while (hi - lo > precision) {
+      const mid = (lo + hi) / 2;
+      h2.style.fontSize = mid + 'px';
+      if (fits()) lo = mid; else hi = mid;
+    }
+    h2.style.fontSize = Math.max(min, lo) + 'px';
+  }
+
+  // Programar un ajuste tras el siguiente frame
+  function scheduleFit() {
+    const { h2, box } = getRefs();
+    if (!h2 || !box) return;
+    requestAnimationFrame(() => fitText(h2, box, { min: 14, max: 64, precision: 0.5 }));
+  }
+
+  function ensureObservers() {
+    if (observersReady) return;
+    const { h2, box } = getRefs();
+    if (!h2 || !box) return;
+
+    new ResizeObserver(scheduleFit).observe(box);
+    new MutationObserver(scheduleFit).observe(h2, { childList: true, characterData: true, subtree: true });
+
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(scheduleFit).catch(() => {});
+    }
+    window.addEventListener('resize', scheduleFit);
+    observersReady = true;
+    scheduleFit();
+  }
+  // ---------------------------------------------------------
+
   function init() {
     if (started) return;
     started = true;
@@ -34,6 +88,8 @@
     // Mantener XFX hasta primer click
     const { root } = getRefs();
     if (root && !root.dataset.idx) root.dataset.idx = '-1';
+
+    ensureObservers();
 
     const pickSrc = p =>
       p?.acf?.['imagen-landing']?.url ||
@@ -61,6 +117,7 @@
         h2.textContent = ttl;
         img.alt = ttl;
         img.title = ttl;
+        scheduleFit(); // ajustar tamaño del título después de cambiar el texto
       }
       root.dataset.idx = String(i);
 
@@ -84,32 +141,32 @@
       const izq = e.target.closest('#motoIzq');
       if (!der && !izq) return;
 
-      // Evita navegación si son <a>
       e.preventDefault();
       e.stopPropagation();
 
-      // No intentes mover si aún no hay productos
       if (!products.length) return;
 
       if (der) move(1);
       else if (izq) move(-1);
     });
 
-    // Actualiza productos cuando llegue tu evento
+    // Actualiza productos cuando llegue tu evento (mantén XFX hasta click)
     document.addEventListener('woo:products:ready', (ev) => {
       const arr = ev?.detail;
       products = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
-      // No render aquí: mantenemos XFX hasta que el usuario haga click
+      scheduleFit(); // por si cambia el layout
     }, { once: false });
 
-    // Por si el HTML de #carruselMotos se inserta tarde, ajusta idx cuando exista
+    // Si el HTML de #carruselMotos se inserta tarde
     if (!root) {
       const mo = new MutationObserver(() => {
         const { root } = getRefs();
         if (root && !root.dataset.idx) root.dataset.idx = '-1';
+        ensureObservers();
       });
       mo.observe(document.documentElement, { childList: true, subtree: true });
-      // El observer puede quedarse; es barato y solo setea data-idx si falta.
+    } else {
+      scheduleFit();
     }
   }
 
