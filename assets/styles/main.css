@@ -182,8 +182,8 @@ footer small, #tranquilidad p, h1, h2, h3, h4 {
         width: -webkit-fill-available;
     }
     #formulario img{
-        width: 33.3333333333vw;
-        min-height: 100vh;
+        width: 33.33dvw;
+        min-height: 100dvh;
         height: 100%;
     }
     #formulario {
@@ -257,7 +257,6 @@ footer small, #tranquilidad p, h1, h2, h3, h4 {
     padding: 0px;
     margin: 0px;
     max-width: 1920px;
-    overflow: hidden;
     justify-content: center;
 }
 #carruselMotos img.flechas {
@@ -883,11 +882,12 @@ body.gracias img.logo {
 
 /* Inicio de animacion reveal */
 
-section, article, img, svg, form{
+#formulario img, #formulario h2, #formulario p, #formulario small, #elegir-roue .pasos div, #elegir-roue h2, #elegir-roue p, #ventajas img, #ventajas figcaption, #ventajas aside, #ventajas h2, #ventajas li, #ventajas p, #ventajas a.btn, #ventajas .RecVer, #elegir-roue .RecVer small, #ventajas .RecVer small, #beneficios article.BGAmarillo, #beneficios h2, #beneficios h3, #beneficios figure, #tranquilidad img, #tranquilidad p, #tranquilidad h2, #tranquilidad p, #tranquilidad li, #comprar h2, #comprar > figure img, #comprar p {
     animation: reveal linear both;
       animation-range: entry 10% cover 20%;
       animation-timeline: view();
   }
+  
   footer section,footer article,footer article,footer div,footer, footer img, footer svg{
     animation: none!important;}
     
