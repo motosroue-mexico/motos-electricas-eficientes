@@ -1,12 +1,11 @@
 // /assets/scripts/carrusel-principal.js
 (() => {
-  // Endpoint (puedes sobreescribir con window.WOO_PRODUCTS_ENDPOINT antes de este script)
   const ENDPOINT = window.WOO_PRODUCTS_ENDPOINT || '/.netlify/functions/wordpress-products';
 
   // Estado
   let products = [];
   let idx = -1;                 // -1 = sigues viendo el HTML inicial (XFX)
-  let pendingFirstDelta = null; // recuerda el primer clic si ocurre antes del fetch
+  let pendingFirstClick = false;
 
   // Refs DOM en el momento de usar
   function refs() {
@@ -16,13 +15,13 @@
     return { root, img, h2 };
   }
 
-  // Pickers de datos
+  // Helpers de datos
   const pickSrc = p =>
     p?.acf?.['imagen-landing']?.url || p?.acf?.['imagen-landing'] || p?.image || '';
   const pickTitle = p =>
     p?.acf?.['nombre-landing'] || p?.name || '';
 
-  // Render inmediato (texto e imagen)
+  // Render
   function render(i) {
     const { root, img, h2 } = refs();
     if (!root || !img || !h2 || !products.length) return;
@@ -40,44 +39,42 @@
 
     root.dataset.idx = String(idx);
 
-    // Pre-carga siguiente para que el próximo clic sea fluido
+    // Precarga siguiente
     const nextSrc = pickSrc(products[(idx + 1) % len]);
     if (nextSrc) { const im = new Image(); im.src = nextSrc; }
   }
 
-  // Manejo de clic
+  // Click handler
   function step(delta) {
     const { root } = refs();
     if (!root) return;
 
-    // Asegura el marcador de estado inicial
     if (!root.dataset.idx) root.dataset.idx = '-1';
 
-    // Si aún no hay data, recuerda este primer clic y sal
+    // Si aún no hay datos, recordamos que hubo primer clic
     if (!products.length) {
-      if (pendingFirstDelta === null) pendingFirstDelta = delta;
+      pendingFirstClick = true;
       return;
     }
 
-    // Primer clic: del -1 pasa a 0 (→) o último (←)
+    // Primer clic: del -1 pasa SIEMPRE a 0 (sin importar dirección)
     if (idx < 0) {
-      const start = (delta >= 0) ? 0 : (products.length - 1);
-      render(start);
-      return; // el primer clic solo posiciona
+      render(0);
+      return; // ese primer clic solo “posiciona”
     }
 
     // Resto de clics: ±1
     render(idx + delta);
   }
 
-  // API pública para tus botones con onclick
+  // API pública para tus onclick
   window.CarruselRoue = {
     next: () => step(1),
     prev: () => step(-1),
-    init: () => step(0), // opcional: si algún día quieres pintar el primero manualmente
+    init: () => step(0), // opcional
   };
 
-  // Fetch inmediato al cargar (sin tocar data-idx)
+  // Fetch inmediato al cargar (no toca data-idx)
   (async () => {
     try {
       const res = await fetch(ENDPOINT, { credentials: 'omit' });
@@ -89,21 +86,18 @@
         p && (p.status === undefined || p.status === 'publish') && (pickSrc(p) || pickTitle(p))
       );
 
-      // Si alguien ya clicó mientras cargaba, aplica ese primer clic ahora
-      if (products.length && pendingFirstDelta !== null) {
+      // Si ya hubo clic mientras cargaba, al llegar la data vamos directo al 0
+      if (products.length && pendingFirstClick && idx < 0) {
         const { root } = refs();
-        if (root && root.dataset.idx === '-1' && idx < 0) {
-          const start = pendingFirstDelta >= 0 ? 0 : (products.length - 1);
-          render(start); // aquí recién cambiamos data-idx a 0 o último
-        }
-        pendingFirstDelta = null;
+        if (root && root.dataset.idx === '-1') render(0);
       }
+      pendingFirstClick = false;
     } catch {
       products = []; // si falla, no habrá navegación
     }
   })();
 
-  // Marca data-idx = -1 cuando el DOM base esté (no pinta nada)
+  // Marca data-idx = -1 cuando el DOM base esté (sin render automático)
   document.addEventListener('DOMContentLoaded', () => {
     const { root } = refs();
     if (root && !root.dataset.idx) root.dataset.idx = '-1';
