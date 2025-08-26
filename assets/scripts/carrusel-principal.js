@@ -1,16 +1,15 @@
 // /assets/scripts/carrusel-principal.js
 (() => {
-  console.log('[carruselMotos] script loaded');
-
-  // Estado
-  let products = [];
-  let idx = -1; // -1 = sigues viendo el HTML inicial (XFX)
-
-  // Endpoint Netlify (puedes sobreescribir con window.WOO_PRODUCTS_ENDPOINT antes de este script)
+  // --- Config ---
   const ENDPOINT = window.WOO_PRODUCTS_ENDPOINT || '/.netlify/functions/wordpress-products';
-  console.log('[carruselMotos] endpoint =', ENDPOINT);
+  const AUTO_INIT_AFTER_FETCH = true; // pone en true para que, apenas llegue la data, pinte el 1er producto
 
-  // ---- Refs DOM (sin esperar nada; se revisa en cada clic) ----
+  // --- Estado ---
+  let products = [];
+  let idx = -1;            // -1 = sigues viendo el HTML inicial (XFX)
+  let fetched = false;
+
+  // --- Refs DOM (resueltos en el momento del clic/render) ---
   function refs() {
     const root = document.getElementById('carruselMotos');
     const img  = root?.querySelector('img.motos') || null;
@@ -18,48 +17,18 @@
     return { root, img, h2 };
   }
 
-  // ---- Pickers de datos ----
+  // --- Pickers de datos ---
   const pickSrc = p =>
     p?.acf?.['imagen-landing']?.url || p?.acf?.['imagen-landing'] || p?.image || '';
   const pickTitle = p =>
     p?.acf?.['nombre-landing'] || p?.name || '';
 
-  // ---- FETCH: se dispara INMEDIATAMENTE al cargar el script ----
-  const fetchPromise = (async () => {
-    console.log('[carruselMotos] fetch: start');
-    try {
-      const res = await fetch(ENDPOINT, { credentials: 'omit' });
-      console.log('[carruselMotos] fetch: status', res.status);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-
-      const data = await res.json();
-      const raw = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
-      console.log('[carruselMotos] fetch: raw items', raw?.length);
-
-      products = (raw || []).filter(p => {
-        const ok = p && (p.status === undefined || p.status === 'publish') && (pickSrc(p) || pickTitle(p));
-        if (!ok) {
-          console.log('[carruselMotos] filtered OUT', {
-            id: p?.id, status: p?.status, src: pickSrc(p), ttl: pickTitle(p)
-          });
-        }
-        return ok;
-      });
-      console.log('[carruselMotos] fetch: valid products', products.length);
-    } catch (err) {
-      console.error('[carruselMotos] fetch ERROR:', err);
-      products = [];
-    }
-  })();
-
-  // ---- Render ----
+  // --- Render ---
   function render(i) {
     const { root, img, h2 } = refs();
-    if (!root || !img || !h2) { console.warn('[carruselMotos] render: faltan elementos'); return; }
-    if (!products.length)     { console.warn('[carruselMotos] render: sin productos');  return; }
+    if (!root || !img || !h2 || !products.length) return;
 
     const len = products.length;
-    const original = i;
     i = ((i % len) + len) % len;
     idx = i;
 
@@ -67,53 +36,81 @@
     const src = pickSrc(p);
     const ttl = pickTitle(p);
 
-    console.log('[carruselMotos] render:', { originalIndex: original, index: i, src, ttl });
-
     if (src) img.src = src;
     if (ttl) { h2.textContent = ttl; img.alt = ttl; img.title = ttl; }
     root.dataset.idx = String(idx);
 
-    // Precarga siguiente
+    // Precarga la siguiente
     const nextSrc = pickSrc(products[(idx + 1) % len]);
     if (nextSrc) { const im = new Image(); im.src = nextSrc; }
   }
 
-  // ---- Paso al clic (no hace nada hasta que tú cliques) ----
-  async function step(delta) {
-    console.log('[carruselMotos] step delta=', delta, ' idx=', idx);
+  // --- Acciones al clic (no bloquean por fetch) ---
+  function step(delta) {
+    const { root } = refs();
+    if (!root) return;
 
-    // Asegura refs en el momento del clic (tu loader ya debió inyectarlos)
-    const { root, img, h2 } = refs();
-    if (!root || !img || !h2) {
-      console.warn('[carruselMotos] step: DOM incompleto', { root: !!root, img: !!img, h2: !!h2 });
-      return;
-    }
     if (!root.dataset.idx) root.dataset.idx = '-1';
 
-    // Espera a que el fetch que arrancó al inicio termine
-    await fetchPromise;
-    if (!products.length) { console.warn('[carruselMotos] step: sin productos tras fetch'); return; }
+    if (!products.length) {
+      // Aún no llegó la data: no bloqueamos el clic; el siguiente clic ya será instantáneo
+      return;
+    }
 
-    // Primer clic: define punto de partida según flecha
     if (idx < 0) {
+      // Primer salto: decide desde dónde arrancar
       idx = delta >= 0 ? 0 : products.length - 1;
-      console.log('[carruselMotos] first render idx=', idx);
       render(idx);
-      if (delta === 0) return; // init simple
+      if (delta === 0) return;
     }
 
     render(idx + delta);
   }
 
-  // ---- API pública para onclick ----
+  // --- API pública para tus onclick ---
   window.CarruselRoue = {
-    next: () => { console.log('[carruselMotos] next()'); step(1); },
-    prev: () => { console.log('[carruselMotos] prev()'); step(-1); },
-    init: () => { console.log('[carruselMotos] init()'); step(0); } // si quieres pintar sin clic
+    next: () => step(1),
+    prev: () => step(-1),
+    init: () => step(0), // si quieres dispararlo manualmente en algún momento
   };
-  console.log('[carruselMotos] API expuesta: window.CarruselRoue');
 
-  // Marca el estado inicial cuando el DOM base esté (no renderiza nada)
+  // --- Fetch inmediato al cargar el script (sin bloquear clics) ---
+  (async () => {
+    try {
+      // timeout defensivo para no colgar
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 8000);
+
+      const res = await fetch(ENDPOINT, { credentials: 'omit', signal: controller.signal });
+      clearTimeout(t);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      const data = await res.json();
+      const raw = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
+
+      products = (raw || []).filter(p =>
+        p && (p.status === undefined || p.status === 'publish') && (pickSrc(p) || pickTitle(p))
+      );
+
+      fetched = true;
+
+      // Si quieres máxima rapidez de clic, deja esto en true:
+      if (AUTO_INIT_AFTER_FETCH) {
+        const { root } = refs();
+        if (root && root.dataset.idx === '-1' && products.length) {
+          // Pintamos el primero de una vez; así el primer clic ya navega instantáneo
+          render(0);
+        }
+      }
+    } catch (e) {
+      // Si falla, no bloqueamos nada; simplemente no habrá navegación
+      fetched = true;
+      products = [];
+      // console.error('fetch error', e);
+    }
+  })();
+
+  // Marca estado inicial cuando el DOM base esté (no obliga a render)
   document.addEventListener('DOMContentLoaded', () => {
     const { root } = refs();
     if (root && !root.dataset.idx) root.dataset.idx = '-1';
