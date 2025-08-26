@@ -1,12 +1,14 @@
 // /assets/scripts/carrusel-principal.js
 (() => {
+  // Endpoint (puedes sobreescribir con window.WOO_PRODUCTS_ENDPOINT antes de este script)
   const ENDPOINT = window.WOO_PRODUCTS_ENDPOINT || '/.netlify/functions/wordpress-products';
 
+  // Estado
   let products = [];
-  let idx = -1;                // -1 = sigues viendo el HTML inicial
-  let pendingFirstDelta = null;
+  let idx = -1;                 // -1 = sigues viendo el HTML inicial (XFX)
+  let pendingFirstDelta = null; // recuerda el primer clic si ocurre antes del fetch
 
-  // --- DOM refs en el momento de usar ---
+  // Refs DOM en el momento de usar
   function refs() {
     const root = document.getElementById('carruselMotos');
     const img  = root?.querySelector('img.motos') || null;
@@ -14,107 +16,94 @@
     return { root, img, h2 };
   }
 
-  // --- helpers de datos ---
-  const pickSrc   = p => p?.acf?.['imagen-landing']?.url || p?.acf?.['imagen-landing'] || p?.image || '';
-  const pickTitle = p => p?.acf?.['nombre-landing'] || p?.name || '';
+  // Pickers de datos
+  const pickSrc = p =>
+    p?.acf?.['imagen-landing']?.url || p?.acf?.['imagen-landing'] || p?.image || '';
+  const pickTitle = p =>
+    p?.acf?.['nombre-landing'] || p?.name || '';
 
-  // --- precarga N imágenes para clicks ultra veloces ---
-  function warmImages(n = 8) {
-    const seen = new Set();
-    for (let i = 0; i < Math.min(n, products.length); i++) {
-      const s = pickSrc(products[i]);
-      if (s && !seen.has(s)) { seen.add(s); const im = new Image(); im.src = s; }
-    }
-  }
-
-  // --- render con precarga del frame objetivo (h2 inmediato, imagen al cargar) ---
-  function renderTo(targetIdx) {
+  // Render inmediato (texto e imagen)
+  function render(i) {
     const { root, img, h2 } = refs();
     if (!root || !img || !h2 || !products.length) return;
 
     const len = products.length;
-    targetIdx = ((targetIdx % len) + len) % len;
+    i = ((i % len) + len) % len; // normaliza
+    idx = i;
 
-    const p   = products[targetIdx];
+    const p   = products[i];
     const src = pickSrc(p);
     const ttl = pickTitle(p);
 
-    // Texto al instante
     if (ttl) { h2.textContent = ttl; img.alt = ttl; img.title = ttl; }
+    if (src) img.src = src;
 
-    // Cambia imagen cuando termine de cargar (sin parpadeo)
-    if (src) {
-      const pre = new Image();
-      pre.onload = () => { img.src = src; };
-      pre.onerror = () => { img.src = src; }; // fallback: igual la ponemos
-      pre.src = src;
-    }
-
-    idx = targetIdx;
     root.dataset.idx = String(idx);
 
-    // precarga la siguiente
+    // Pre-carga siguiente para que el próximo clic sea fluido
     const nextSrc = pickSrc(products[(idx + 1) % len]);
     if (nextSrc) { const im = new Image(); im.src = nextSrc; }
   }
 
-  // --- click handler “rápido” ---
+  // Manejo de clic
   function step(delta) {
     const { root } = refs();
     if (!root) return;
+
+    // Asegura el marcador de estado inicial
     if (!root.dataset.idx) root.dataset.idx = '-1';
 
+    // Si aún no hay data, recuerda este primer clic y sal
     if (!products.length) {
-      // aún no está la data: guarda este primer clic para aplicarlo en cuanto llegue
       if (pendingFirstDelta === null) pendingFirstDelta = delta;
       return;
     }
 
+    // Primer clic: del -1 pasa a 0 (→) o último (←)
     if (idx < 0) {
-      // primer clic: 0 si derecha, último si izquierda (y NO sumamos más)
-      const start = delta >= 0 ? 0 : (products.length - 1);
-      renderTo(start);
-      return;
+      const start = (delta >= 0) ? 0 : (products.length - 1);
+      render(start);
+      return; // el primer clic solo posiciona
     }
 
-    renderTo(idx + delta);
+    // Resto de clics: ±1
+    render(idx + delta);
   }
 
-  // --- API pública para tus onclick ---
+  // API pública para tus botones con onclick
   window.CarruselRoue = {
     next: () => step(1),
     prev: () => step(-1),
-    init: () => step(0), // opcional
+    init: () => step(0), // opcional: si algún día quieres pintar el primero manualmente
   };
 
-  // --- fetch inmediato al cargar (y calienta imágenes) ---
+  // Fetch inmediato al cargar (sin tocar data-idx)
   (async () => {
     try {
       const res = await fetch(ENDPOINT, { credentials: 'omit' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
+
       const data = await res.json();
       const raw  = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
-      products = (raw || []).filter(p => (pickSrc(p) || pickTitle(p)) && (p.status === undefined || p.status === 'publish'));
+      products = (raw || []).filter(p =>
+        p && (p.status === undefined || p.status === 'publish') && (pickSrc(p) || pickTitle(p))
+      );
 
-      if (products.length) {
-        warmImages(10); // precalienta las primeras
-
-        // si el usuario ya había clickeado mientras cargaba, respóndele YA
-        if (pendingFirstDelta !== null) {
-          const { root } = refs();
-          if (root && root.dataset.idx === '-1' && idx < 0) {
-            const start = pendingFirstDelta >= 0 ? 0 : (products.length - 1);
-            renderTo(start);
-          }
-          pendingFirstDelta = null;
+      // Si alguien ya clicó mientras cargaba, aplica ese primer clic ahora
+      if (products.length && pendingFirstDelta !== null) {
+        const { root } = refs();
+        if (root && root.dataset.idx === '-1' && idx < 0) {
+          const start = pendingFirstDelta >= 0 ? 0 : (products.length - 1);
+          render(start); // aquí recién cambiamos data-idx a 0 o último
         }
+        pendingFirstDelta = null;
       }
-    } catch (e) {
-      products = []; // si falla, no hay navegación
+    } catch {
+      products = []; // si falla, no habrá navegación
     }
   })();
 
-  // marca data-idx = -1 cuando el DOM base esté (no pinta nada)
+  // Marca data-idx = -1 cuando el DOM base esté (no pinta nada)
   document.addEventListener('DOMContentLoaded', () => {
     const { root } = refs();
     if (root && !root.dataset.idx) root.dataset.idx = '-1';
