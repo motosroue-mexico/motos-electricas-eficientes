@@ -1,6 +1,5 @@
 (() => {
   let started = false;
-  let observersReady = false;
 
   // Helpers de selección (rebuscan por si el HTML se montó tarde)
   function getRefs() {
@@ -10,7 +9,6 @@
       root,
       img: root.querySelector('img.motos'),
       h2:  root.querySelector('h2'),
-      box: root.querySelector('figcaption') || root, // contenedor para ajustar el texto
     };
   }
 
@@ -25,7 +23,6 @@
       return [];
     }
   }
-  // ---------------------------------------------------------
 
   function init() {
     if (started) return;
@@ -36,8 +33,6 @@
     // Mantener XFX hasta primer click
     const { root } = getRefs();
     if (root && !root.dataset.idx) root.dataset.idx = '-1';
-
-    ensureObservers();
 
     const pickSrc = p =>
       p?.acf?.['imagen-landing']?.url ||
@@ -65,7 +60,6 @@
         h2.textContent = ttl;
         img.alt = ttl;
         img.title = ttl;
-        scheduleFit(); // ajustar tamaño del título después de cambiar el texto
       }
       root.dataset.idx = String(i);
 
@@ -102,19 +96,18 @@
     document.addEventListener('woo:products:ready', (ev) => {
       const arr = ev?.detail;
       products = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
-      scheduleFit(); // por si cambia el layout
     }, { once: false });
 
-    // Si el HTML de #carruselMotos se inserta tarde
+    // Si el HTML de #carruselMotos se inserta tarde, solo inicializa idx
     if (!root) {
       const mo = new MutationObserver(() => {
         const { root } = getRefs();
-        if (root && !root.dataset.idx) root.dataset.idx = '-1';
-        ensureObservers();
+        if (root && !root.dataset.idx) {
+          root.dataset.idx = '-1';
+          mo.disconnect();
+        }
       });
       mo.observe(document.documentElement, { childList: true, subtree: true });
-    } else {
-      scheduleFit();
     }
   }
 
