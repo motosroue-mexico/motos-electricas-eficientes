@@ -3,67 +3,67 @@
 /* ===== Mobile ===== */
 @media (max-width: 767.98px) {
   /* XFX */
-  #carruselMotos:has(img[alt="XFX" i]) h2 { font-size: 24px; }
+  #carruselMotos:has(img[alt="XFX" i]) h2 { font-size: 130px; }
 
   /* APEX */
-  #carruselMotos:has(img[alt="APEX" i]) h2 { font-size: 24px; }
+  #carruselMotos:has(img[alt="APEX" i]) h2 { font-size: 90px; }
 
   /* Y1 */
-  #carruselMotos:has(img[alt="Y1" i]) h2 { font-size: 24px; }
+  #carruselMotos:has(img[alt="Y1" i]) h2 { font-size: 180px; }
 
   /* Y2 */
-  #carruselMotos:has(img[alt="Y2" i]) h2 { font-size: 24px; }
+  #carruselMotos:has(img[alt="Y2" i]) h2 { font-size: 180px; }
 
   /* XFX SPORT */
-  #carruselMotos:has(img[alt="XFX SPORT" i]) h2 { font-size: 24px; }
+  #carruselMotos:has(img[alt="XFX SPORT" i]) h2 { font-size: 75px; }
 
   /* E5 */
-  #carruselMotos:has(img[alt="E5" i]) h2 { font-size: 24px; }
+  #carruselMotos:has(img[alt="E5" i]) h2 { font-size: 180px; }
 
   /* TALARIA */
-  #carruselMotos:has(img[alt="TALARIA" i]) h2 { font-size: 24px; }
+  #carruselMotos:has(img[alt="TALARIA" i]) h2 { font-size: 55px; }
 
   /* ZL2 */
-  #carruselMotos:has(img[alt="ZL2" i]) h2 { font-size: 24px; }
+  #carruselMotos:has(img[alt="ZL2" i]) h2 { font-size: 130px; }
 
   /* ZL8 */
-  #carruselMotos:has(img[alt="ZL8" i]) h2 { font-size: 24px; }
+  #carruselMotos:has(img[alt="ZL8" i]) h2 { font-size: 130px; }
 
   /* ZS */
-  #carruselMotos:has(img[alt="ZS" i]) h2 { font-size: 24px; }
+  #carruselMotos:has(img[alt="ZS" i]) h2 { font-size: 180px; }
 }
 
 /* ===== Desktop ===== */
 @media (min-width: 768px) {
   /* XFX */
-  #carruselMotos:has(img[alt="XFX" i]) h2 { font-size: 36px; }
+  #carruselMotos:has(img[alt="XFX" i]) h2 { font-size: 195px; }
 
   /* APEX */
-  #carruselMotos:has(img[alt="APEX" i]) h2 { font-size: 36px; }
+  #carruselMotos:has(img[alt="APEX" i]) h2 { font-size: 143px; }
 
   /* Y1 */
-  #carruselMotos:has(img[alt="Y1" i]) h2 { font-size: 36px; }
+  #carruselMotos:has(img[alt="Y1" i]) h2 { font-size: 250px; }
 
   /* Y2 */
-  #carruselMotos:has(img[alt="Y2" i]) h2 { font-size: 36px; }
+  #carruselMotos:has(img[alt="Y2" i]) h2 { font-size: 250px; }
 
   /* XFX SPORT */
-  #carruselMotos:has(img[alt="XFX SPORT" i]) h2 { font-size: 36px; }
+  #carruselMotos:has(img[alt="XFX SPORT" i]) h2 { font-size: 114px; }
 
   /* E5 */
-  #carruselMotos:has(img[alt="E5" i]) h2 { font-size: 36px; }
+  #carruselMotos:has(img[alt="E5" i]) h2 { font-size: 250px; }
 
   /* TALARIA */
-  #carruselMotos:has(img[alt="TALARIA" i]) h2 { font-size: 36px; }
+  #carruselMotos:has(img[alt="TALARIA" i]) h2 { font-size: 84px; }
 
   /* ZL2 */
-  #carruselMotos:has(img[alt="ZL2" i]) h2 { font-size: 36px; }
+  #carruselMotos:has(img[alt="ZL2" i]) h2 { font-size: 195px; }
 
   /* ZL8 */
-  #carruselMotos:has(img[alt="ZL8" i]) h2 { font-size: 36px; }
+  #carruselMotos:has(img[alt="ZL8" i]) h2 { font-size: 195px; }
 
   /* ZS */
-  #carruselMotos:has(img[alt="ZS" i]) h2 { font-size: 36px; }
+  #carruselMotos:has(img[alt="ZS" i]) h2 { font-size: 250px; }
 }
 
 
@@ -310,6 +310,7 @@ footer small, #tranquilidad p, h1, h2, h3, h4 {
     margin-bottom: 0px;
     color: #595959;
     filter: drop-shadow(2px 4px 6px black);
+    line-height: 0.8;
 }
 #ventajas div{
     position: relative;
@@ -577,7 +578,7 @@ footer nav {
 }
 @media (min-width:768px){
     #carruselMotos h2 {
-        font-size: 200px;
+        font-size: 195px;
     }
     #carruselMotos .botones {
         left: -24px;
