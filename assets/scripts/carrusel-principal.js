@@ -25,29 +25,6 @@
       return [];
     }
   }
-
-  // Programar un ajuste tras el siguiente frame
-  function scheduleFit() {
-    const { h2, box } = getRefs();
-    if (!h2 || !box) return;
-    requestAnimationFrame(() => fitText(h2, box, { min: 14, max: 64, precision: 0.5 }));
-  }
-
-  function ensureObservers() {
-    if (observersReady) return;
-    const { h2, box } = getRefs();
-    if (!h2 || !box) return;
-
-    new ResizeObserver(scheduleFit).observe(box);
-    new MutationObserver(scheduleFit).observe(h2, { childList: true, characterData: true, subtree: true });
-
-    if (document.fonts?.ready) {
-      document.fonts.ready.then(scheduleFit).catch(() => {});
-    }
-    window.addEventListener('resize', scheduleFit);
-    observersReady = true;
-    scheduleFit();
-  }
   // ---------------------------------------------------------
 
   function init() {
