@@ -182,7 +182,7 @@ footer small, #tranquilidad p, h1, h2, h3, h4 {
         width: -webkit-fill-available;
     }
     #formulario img{
-        width: 33.33dvw;
+        width: 33.33%;
         min-height: 100dvh;
         height: 100%;
     }
@@ -238,6 +238,7 @@ footer small, #tranquilidad p, h1, h2, h3, h4 {
     display: flex;
     position: absolute;
     z-index: -2;
+    width: 100%;
 }
 #formulario p, #formulario small{
     text-align: center;
@@ -595,6 +596,9 @@ footer nav {
     }
     #ventajas h3::before{
         left: -45px;
+    }
+    #elegir-roue .RecVer{
+        right: 0px;
     }
     #elegir-roue h2{
         font-size: 44px;
