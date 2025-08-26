@@ -26,35 +26,6 @@
     }
   }
 
-  // ---- Auto-fit SOLO JS (búsqueda binaria de font-size) ----
-  function fitText(h2, box, { min = 14, max = 64, precision = 0.5 } = {}) {
-    if (!h2 || !box) return;
-
-    // Ajustes para evitar desbordes
-    h2.style.whiteSpace = 'normal';
-    h2.style.wordBreak  = 'break-word';
-    h2.style.hyphens    = 'auto';
-    h2.style.lineHeight = '1.05';
-
-    const fits = () =>
-      h2.scrollWidth <= box.clientWidth && h2.scrollHeight <= box.clientHeight;
-
-    // Usa como tope el font-size actual si es mayor/menor que el rango
-    const computed = parseFloat(getComputedStyle(h2).fontSize) || max;
-    max = Math.max(min, Math.min(max, Math.round(computed)));
-
-    h2.style.fontSize = max + 'px';
-    if (fits()) return;
-
-    let lo = min, hi = max;
-    while (hi - lo > precision) {
-      const mid = (lo + hi) / 2;
-      h2.style.fontSize = mid + 'px';
-      if (fits()) lo = mid; else hi = mid;
-    }
-    h2.style.fontSize = Math.max(min, lo) + 'px';
-  }
-
   // Programar un ajuste tras el siguiente frame
   function scheduleFit() {
     const { h2, box } = getRefs();
