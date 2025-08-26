@@ -11,8 +11,9 @@
     <!-- vacío a propósito -->
   </article>
 
-  <button class="btn" id="comprarPrev" type="button" aria-label="Anterior" disabled>‹</button>
-  <button class="btn" id="comprarNext" type="button" aria-label="Siguiente">›</button>
+<button class="btn" id="comprarPrev" type="button" aria-label="Anterior" onclick="ComprarCarousel.prev()">‹</button>
+<button class="btn" id="comprarNext" type="button" aria-label="Siguiente" onclick="ComprarCarousel.next()">›</button>
+
 
   <!-- Plantilla para cada tarjeta (misma estructura que usas) -->
   <template id="tplComprarItem">
