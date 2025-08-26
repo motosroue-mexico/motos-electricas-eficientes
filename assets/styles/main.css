@@ -1,5 +1,74 @@
 /* CSS PERSONALIZADO */
 
+/* ===== Mobile ===== */
+@media (max-width: 767.98px) {
+  /* XFX */
+  #carruselMotos:has(img[alt="XFX" i]) h2 { font-size: 24px; }
+
+  /* APEX */
+  #carruselMotos:has(img[alt="APEX" i]) h2 { font-size: 24px; }
+
+  /* Y1 */
+  #carruselMotos:has(img[alt="Y1" i]) h2 { font-size: 24px; }
+
+  /* Y2 */
+  #carruselMotos:has(img[alt="Y2" i]) h2 { font-size: 24px; }
+
+  /* XFX SPORT */
+  #carruselMotos:has(img[alt="XFX SPORT" i]) h2 { font-size: 24px; }
+
+  /* E5 */
+  #carruselMotos:has(img[alt="E5" i]) h2 { font-size: 24px; }
+
+  /* TALARIA */
+  #carruselMotos:has(img[alt="TALARIA" i]) h2 { font-size: 24px; }
+
+  /* ZL2 */
+  #carruselMotos:has(img[alt="ZL2" i]) h2 { font-size: 24px; }
+
+  /* ZL8 */
+  #carruselMotos:has(img[alt="ZL8" i]) h2 { font-size: 24px; }
+
+  /* ZS */
+  #carruselMotos:has(img[alt="ZS" i]) h2 { font-size: 24px; }
+}
+
+/* ===== Desktop ===== */
+@media (min-width: 768px) {
+  /* XFX */
+  #carruselMotos:has(img[alt="XFX" i]) h2 { font-size: 36px; }
+
+  /* APEX */
+  #carruselMotos:has(img[alt="APEX" i]) h2 { font-size: 36px; }
+
+  /* Y1 */
+  #carruselMotos:has(img[alt="Y1" i]) h2 { font-size: 36px; }
+
+  /* Y2 */
+  #carruselMotos:has(img[alt="Y2" i]) h2 { font-size: 36px; }
+
+  /* XFX SPORT */
+  #carruselMotos:has(img[alt="XFX SPORT" i]) h2 { font-size: 36px; }
+
+  /* E5 */
+  #carruselMotos:has(img[alt="E5" i]) h2 { font-size: 36px; }
+
+  /* TALARIA */
+  #carruselMotos:has(img[alt="TALARIA" i]) h2 { font-size: 36px; }
+
+  /* ZL2 */
+  #carruselMotos:has(img[alt="ZL2" i]) h2 { font-size: 36px; }
+
+  /* ZL8 */
+  #carruselMotos:has(img[alt="ZL8" i]) h2 { font-size: 36px; }
+
+  /* ZS */
+  #carruselMotos:has(img[alt="ZS" i]) h2 { font-size: 36px; }
+}
+
+
+
+
 @font-face {
   font-family: 'Arimo';
   src: url('/assets/Arimo-VariableFont_wght.ttf') format('truetype');
