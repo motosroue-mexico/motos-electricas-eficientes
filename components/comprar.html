@@ -1,62 +1,26 @@
 <figure>
     <img loading="lazy" src="/assets/images/logoroue.webp" alt="ROUE MOTOS" decoding="async" width="60" height="60">
     <figcaption>
-        <h2>
-            ¡COMPRA TU MOTO ELÉCTRICA AHORA!
-        </h2>
-        <p>
-            Descubre como nuestras motos pueden ayudarte a reducir costos y mejorar tu movilidad.
-        </p>
+      <h2>¡COMPRA TU MOTO ELÉCTRICA AHORA!</h2>
+      <p>Descubre como nuestras motos pueden ayudarte a reducir costos y mejorar tu movilidad.</p>
     </figcaption>
-</figure>
+  </figure>
 
-<article>
-    <figure>
-        <img loading="lazy" src="/assets/images/XFX.webp" alt="XFX" decoding="async" width="320" height="220">
-        <figcaption>
-            <h3>XFX</h3>
-            <a href="" class="btn BGNegro" target="_blank">$58,999</a>
-        </figcaption>
-    </figure>
-    <figure>
-        <img loading="lazy" src="/assets/images/XFX.webp" alt="XFX" decoding="async" width="320" height="220">
-        <figcaption>
-            <h3>XFX</h3>
-            <a href="" class="btn BGNegro" target="_blank">$58,999</a>
-        </figcaption>
-    </figure>
-    <figure>
-        <img loading="lazy" src="/assets/images/XFX.webp" alt="XFX" decoding="async" width="320" height="220">
-        <figcaption>
-            <h3>XFX</h3>
-            <a href="" class="btn BGNegro" target="_blank">$58,999</a>
-        </figcaption>
-    </figure>
-    <figure>
-        <img loading="lazy" src="/assets/images/XFX.webp" alt="XFX" decoding="async" width="320" height="220">
-        <figcaption>
-            <h3>XFX</h3>
-            <a href="" class="btn BGNegro" target="_blank">$58,999</a>
-        </figcaption>
-    </figure>
-    <figure>
-        <img loading="lazy" src="/assets/images/XFX.webp" alt="XFX" decoding="async" width="320" height="220">
-        <figcaption>
-            <h3>XFX</h3>
-            <a href="" class="btn BGNegro" target="_blank">$58,999</a>
-        </figcaption>
-    </figure>
-    <figure>
-        <img loading="lazy" src="/assets/images/XFX.webp" alt="XFX" decoding="async" width="320" height="220">
-        <figcaption>
-            <h3>XFX</h3>
-            <a href="" class="btn BGNegro" target="_blank">$58,999</a>
-        </figcaption>
-    </figure>
-</article>
+  <!-- Aquí se inyectan TODOS los productos del fetch -->
+  <article tabindex="0">
+    <!-- vacío a propósito -->
+  </article>
 
-<button class="btn" id="comprarPrev" type="button" aria-label="Anterior">‹</button>
-<button class="btn" id="comprarNext" type="button" aria-label="Siguiente">›</button>
+  <button class="btn" id="comprarPrev" type="button" aria-label="Anterior" disabled>‹</button>
+  <button class="btn" id="comprarNext" type="button" aria-label="Siguiente">›</button>
 
-
-
+  <!-- Plantilla para cada tarjeta (misma estructura que usas) -->
+  <template id="tplComprarItem">
+    <figure>
+      <img loading="lazy" src="" alt="" decoding="async" width="320" height="220">
+      <figcaption>
+        <h3></h3>
+        <a href="" class="btn BGNegro" target="_blank"></a>
+      </figcaption>
+    </figure>
+  </template>
