@@ -1,89 +1,111 @@
 // /assets/scripts/carrusel-principal.js
 (() => {
   let products = [];
-  let idx = -1;
-  let fetched = false;
+  let idx = -1;          // -1 = todavía mostrando el HTML inicial (XFX)
+  let fetching = false;
 
-  const ENDPOINT = window.WOO_PRODUCTS_ENDPOINT || '/.netlify/functions/roue-products';
+  const ENDPOINT = window.WOO_PRODUCTS_ENDPOINT || '/.netlify/functions/wordpress-products';
 
-  function refs() {
+  function $refs() {
     const root = document.getElementById('carruselMotos');
     if (!root) return {};
-    return { root, img: root.querySelector('img.motos'), h2: root.querySelector('h2') };
+    return {
+      root,
+      img: root.querySelector('img.motos'),
+      h2:  root.querySelector('figcaption h2') || root.querySelector('h2'),
+    };
   }
 
+  // Helpers para obtener imagen/título del objeto del API
   function pickSrc(p) {
-    return p?.acf?.['imagen-landing']?.url || p?.acf?.['imagen-landing'] || p?.image || '';
+    return p?.acf?.['imagen-landing']?.url
+        || p?.acf?.['imagen-landing']
+        || p?.image
+        || '';
   }
   function pickTitle(p) {
-    return p?.acf?.['nombre-landing'] || p?.name || '';
+    return p?.acf?.['nombre-landing']
+        || p?.name
+        || '';
   }
 
-  async function loadProducts() {
-    if (fetched) return products;
-    fetched = true;
+  async function fetchProducts() {
+    if (fetching || products.length) return products;
+    fetching = true;
     try {
       const res = await fetch(ENDPOINT, { credentials: 'omit' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       const arr = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
-      // Si trae "status", deja solo publish; si no trae status, acepta todos
-      products = (arr || []).filter(p => p && (p.status === undefined || p.status === 'publish'));
+      // Acepta todos si no traen status; si traen status, solo publish
+      const filtered = (arr || []).filter(p =>
+        p && (p.status === undefined || p.status === 'publish') && (pickSrc(p) || pickTitle(p))
+      );
+      products = filtered;
     } catch (e) {
+      console.error('[carruselMotos] Error al cargar productos:', e);
       products = [];
-      console.error('[carruselMotos] fetch error', e);
+    } finally {
+      fetching = false;
     }
     return products;
   }
 
   function render(i) {
-    const { root, img, h2 } = refs();
+    const { root, img, h2 } = $refs();
     if (!root || !img || !h2 || !products.length) return;
 
     const len = products.length;
-    idx = ((i % len) + len) % len;
+    // normaliza índice
+    i = ((i % len) + len) % len;
+    idx = i;
 
-    const p = products[idx];
+    const p   = products[i];
     const src = pickSrc(p);
     const ttl = pickTitle(p);
 
     if (src) img.src = src;
-    if (ttl) { h2.textContent = ttl; img.alt = ttl; img.title = ttl; }
-
+    if (ttl) {
+      h2.textContent = ttl;
+      img.alt = ttl;
+      img.title = ttl;
+    }
     root.dataset.idx = String(idx);
 
-    // Precarga de la siguiente imagen
+    // Precarga siguiente
     const nextSrc = pickSrc(products[(idx + 1) % len]);
     if (nextSrc) { const im = new Image(); im.src = nextSrc; }
   }
 
-  async function ensureReady() {
-    const { root, img, h2 } = refs();
-    if (!root || !img || !h2) return false;
-    if (!root.dataset.idx) root.dataset.idx = '-1';
-    if (!products.length) await loadProducts();
-    if (products.length && root.dataset.idx === '-1') render(0);
-    return products.length > 0;
+  async function step(delta) {
+    const { root, img, h2 } = $refs();
+    if (!root || !img || !h2) return; // aún no está el DOM del carrusel
+
+    if (!products.length) {
+      await fetchProducts();
+      if (!products.length) return; // no hay datos, salimos
+      // Primer click: si venías en -1, define punto de partida según la flecha
+      idx = (idx < 0) ? (delta >= 0 ? 0 : products.length - 1) : idx;
+      render(idx);
+      if (delta === 0) return; // init simple
+    }
+
+    // Siguiente / Anterior
+    render(idx + delta);
   }
 
-  async function next() {
-    const ok = await ensureReady();
-    if (!ok) return;
-    render(idx + 1);
-  }
-  async function prev() {
-    const ok = await ensureReady();
-    if (!ok) return;
-    render(idx - 1);
-  }
-  async function init() { await ensureReady(); }
+  // API pública para tus botones con onclick
+  async function next() { await step(1); }
+  async function prev() { await step(-1); }
+  async function init() { await step(0); } // opcional: pinta el primero cuando lo llames
 
-  // API pública para tus botones onclick
-  window.CarruselRoue = { init, next, prev };
+  window.CarruselRoue = { next, prev, init };
 
-  // Inicializa cuando el DOM ya está y también cuando tu loader inyecta el componente
-  document.addEventListener('DOMContentLoaded', init);
-  document.addEventListener('component:ready', (e) => {
-    if (e?.detail?.id === 'carruselMotos') init();
+  // Si quieres que intente pintar automáticamente cuando cargue el DOM:
+  document.addEventListener('DOMContentLoaded', () => {
+    const { root } = $refs();
+    if (root && !root.dataset.idx) root.dataset.idx = '-1';
+    // Puedes llamar init() aquí si quieres que reemplace XFX por el primer producto sin click:
+    // CarruselRoue.init();
   });
 })();
