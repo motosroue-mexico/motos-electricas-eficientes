@@ -12,23 +12,51 @@
     };
   }
 
-  // Lectura inicial del cache
+  // ---- Lecturas de productos (cache / inline / data-attr) ----
   function readProductsFromCache() {
     try {
       const cached = localStorage.getItem('woo:products');
       if (!cached) return [];
       const arr = JSON.parse(cached);
       return Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
-    } catch {
-      return [];
-    }
+    } catch { return []; }
   }
+
+  function readProductsInline() {
+    const tag = document.getElementById('woo-products-json'); // <script type="application/json" id="woo-products-json">[...]</script>
+    if (!tag) return [];
+    try {
+      const arr = JSON.parse(tag.textContent || '[]');
+      return Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
+    } catch { return []; }
+  }
+
+  function readProductsFromDataset() {
+    const { root } = getRefs();
+    if (!root?.dataset?.products) return [];
+    try {
+      const arr = JSON.parse(root.dataset.products);
+      return Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
+    } catch { return []; }
+  }
+
+  function readProductsFromAnywhere() {
+    const a = readProductsFromCache();
+    if (a.length) return a;
+    const b = readProductsInline();
+    if (b.length) return b;
+    const c = readProductsFromDataset();
+    if (c.length) return c;
+    return [];
+  }
+  // ------------------------------------------------------------
 
   function init() {
     if (started) return;
     started = true;
 
-    let products = readProductsFromCache();
+    let products = readProductsFromAnywhere();
+    console.debug('[carruselMotos] productos iniciales:', products.length);
 
     // Mantener XFX hasta primer click
     const { root } = getRefs();
@@ -95,16 +123,37 @@
     // Actualiza productos cuando llegue tu evento (mantén XFX hasta click)
     document.addEventListener('woo:products:ready', (ev) => {
       const arr = ev?.detail;
-      products = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
+      const next = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
+      console.debug('[carruselMotos] woo:products:ready ->', next.length);
+      products = next;
+      // persiste para próximas visitas/perfiles del mismo origen
+      try { localStorage.setItem('woo:products', JSON.stringify(next)); } catch {}
     }, { once: false });
 
-    // Si el HTML de #carruselMotos se inserta tarde, solo inicializa idx
+    // Si otro tab (mismo origen) actualiza el cache, sincroniza
+    window.addEventListener('storage', (e) => {
+      if (e.key !== 'woo:products') return;
+      try {
+        const arr = JSON.parse(e.newValue || '[]');
+        const next = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
+        console.debug('[carruselMotos] storage woo:products ->', next.length);
+        products = next;
+      } catch {}
+    });
+
+    // Si el HTML de #carruselMotos se inserta tarde, solo inicializa idx y reintenta leer data-products
     if (!root) {
       const mo = new MutationObserver(() => {
         const { root } = getRefs();
         if (root && !root.dataset.idx) {
           root.dataset.idx = '-1';
-          mo.disconnect();
+        }
+        if (root && !products.length) {
+          const fromData = readProductsFromDataset();
+          if (fromData.length) {
+            products = fromData;
+            console.debug('[carruselMotos] dataset fallback ->', products.length);
+          }
         }
       });
       mo.observe(document.documentElement, { childList: true, subtree: true });
