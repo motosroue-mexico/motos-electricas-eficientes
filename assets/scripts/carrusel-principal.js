@@ -1,20 +1,15 @@
 (() => {
   let started = false;
 
-  // Helpers de selección (rebuscan por si el HTML se montó tarde)
+  // ==== helpers ====
   function getRefs() {
     const root = document.getElementById('carruselMotos');
     if (!root) return {};
-    return {
-      root,
-      img: root.querySelector('img.motos'),
-      h2:  root.querySelector('h2'),
-    };
+    return { root, img: root.querySelector('img.motos'), h2: root.querySelector('h2') };
   }
 
-  // ---- Lecturas de productos (sin localStorage): inline / data-attr / fetch ----
   function readProductsInline() {
-    const tag = document.getElementById('woo-products-json'); // <script type="application/json" id="woo-products-json">[...]</script>
+    const tag = document.getElementById('woo-products-json');
     if (!tag) return [];
     try {
       const arr = JSON.parse(tag.textContent || '[]');
@@ -41,36 +36,36 @@
       const data = await res.json();
       const arr = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
       return Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
-    } catch (err) {
-      console.warn('[carruselMotos] fetch error:', err);
-      return [];
-    }
+    } catch { return []; }
   }
-  // ------------------------------------------------------------
 
+  async function hydrateProducts() {
+    let products = readProductsInline();
+    if (!products.length) products = readProductsFromDataset();
+    if (!products.length) products = await fetchProductsFromEndpoint();
+    return products;
+  }
+
+  function pickSrc(p) {
+    return p?.acf?.['imagen-landing']?.url || p?.acf?.['imagen-landing'] || p?.image || '';
+  }
+  function pickTitle(p) {
+    return p?.acf?.['nombre-landing'] || p?.name || '';
+  }
+
+  // ==== init ====
   function init() {
     if (started) return;
     started = true;
 
-    let products = readProductsInline();
-    if (!products.length) products = readProductsFromDataset();
-    console.debug('[carruselMotos] productos iniciales (sin LS):', products.length);
-
-    // Mantener XFX hasta primer click
     const { root } = getRefs();
-    if (root && !root.dataset.idx) root.dataset.idx = '-1';
+    if (!root) return; // seguridad extra
+    if (!root.dataset.idx) root.dataset.idx = '-1'; // mantener XFX hasta primer click
 
-    const pickSrc = p =>
-      p?.acf?.['imagen-landing']?.url ||
-      p?.acf?.['imagen-landing'] ||
-      p?.image || '';
-
-    const pickTitle = p =>
-      p?.acf?.['nombre-landing'] || p?.name || '';
+    let products = [];
 
     function renderByIndex(nextIndex) {
       if (!products.length) return;
-
       const { root, img, h2 } = getRefs();
       if (!root || !img || !h2) return;
 
@@ -82,16 +77,10 @@
       const ttl = pickTitle(p);
 
       if (src) img.src = src;
-      if (ttl) {
-        h2.textContent = ttl;
-        img.alt = ttl;
-        img.title = ttl;
-      }
+      if (ttl) { h2.textContent = ttl; img.alt = ttl; img.title = ttl; }
       root.dataset.idx = String(i);
 
-      // Precarga siguiente
-      const nxt = products[(i + 1) % len];
-      const pre = pickSrc(nxt);
+      const pre = pickSrc(products[(i + 1) % len]);
       if (pre) { const im = new Image(); im.src = pre; }
     }
 
@@ -103,64 +92,64 @@
       renderByIndex((Number.isNaN(current) ? -1 : current) + delta);
     }
 
-    // Delegación de eventos para que funcione aunque el DOM cambie
+    // navegación
     document.addEventListener('click', (e) => {
       const der = e.target.closest('#motoDer');
       const izq = e.target.closest('#motoIzq');
       if (!der && !izq) return;
-
       e.preventDefault();
       e.stopPropagation();
-
       if (!products.length) return;
-
       if (der) move(1);
       else if (izq) move(-1);
     });
 
-    // Si en tu app externa despachas el evento con los productos, actualiza aquí
+    // recibir datos por evento externo
     document.addEventListener('woo:products:ready', (ev) => {
       const arr = ev?.detail;
       const next = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
-      console.debug('[carruselMotos] woo:products:ready ->', next.length);
-      products = next;
+      if (next.length) products = next;
     }, { once: false });
 
-    // Intento de carga desde endpoint si no hubo inline/dataset
+    // re-hidratar cuando todos los componentes ya están montados
+    document.addEventListener('components:all-ready', async () => {
+      const next = await hydrateProducts();
+      if (next.length) products = next;
+    }, { once: true });
+
+    // observar si luego le inyectas data-products
+    const mo = new MutationObserver(() => {
+      const next = readProductsFromDataset();
+      if (next.length) { products = next; /* mo.disconnect(); */ }
+    });
+    mo.observe(root, { attributes: true, attributeFilter: ['data-products'] });
+
+    // primera hidratación (ya existe el root porque esperamos antes)
     (async () => {
-      if (!products.length) {
-        const fetched = await fetchProductsFromEndpoint();
-        if (fetched.length) {
-          products = fetched;
-          console.debug('[carruselMotos] fetched ->', products.length);
-        } else {
-          console.warn('[carruselMotos] Sin productos (inline/dataset/fetch falló)');
-        }
-      }
+      const next = await hydrateProducts();
+      if (next.length) products = next;
     })();
+  }
 
-    // Si el HTML de #carruselMotos se inserta tarde, reintenta leer data-products
-    if (!root) {
-      const mo = new MutationObserver(() => {
-        const { root } = getRefs();
-        if (root && !root.dataset.idx) root.dataset.idx = '-1';
-        if (root && !products.length) {
-          const fromData = readProductsFromDataset();
-          if (fromData.length) {
-            products = fromData;
-            console.debug('[carruselMotos] dataset fallback ->', products.length);
-          }
-        }
+  // ==== bootstrap: espera a que exista #carruselMotos antes de iniciar ====
+  function waitForElement(selector, { timeout = 15000 } = {}) {
+    return new Promise(resolve => {
+      const el = document.querySelector(selector);
+      if (el) return resolve(el);
+      const obs = new MutationObserver(() => {
+        const el2 = document.querySelector(selector);
+        if (el2) { obs.disconnect(); resolve(el2); }
       });
-      mo.observe(document.documentElement, { childList: true, subtree: true });
-    }
+      obs.observe(document.documentElement, { childList: true, subtree: true });
+      setTimeout(() => { obs.disconnect(); resolve(null); }, timeout);
+    });
   }
 
-  // Inicia cuando el DOM esté listo y también cuando tu loader lo indique
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
+  (async () => {
+    if (document.readyState === 'loading') {
+      await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
+    }
+    await waitForElement('#carruselMotos'); // <-- clave: no inicia hasta que exista
     init();
-  }
-  document.addEventListener('components:all-ready', init, { once: true });
+  })();
 })();
