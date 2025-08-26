@@ -1,3 +1,4 @@
+// /assets/scripts/carrusel-principal.js
 (() => {
   let started = false;
 
@@ -5,11 +6,16 @@
   function getRefs() {
     const root = document.getElementById('carruselMotos');
     if (!root) return {};
-    return { root, img: root.querySelector('img.motos'), h2: root.querySelector('h2') };
+    return {
+      root,
+      img: root.querySelector('img.motos'),
+      h2:  root.querySelector('h2'),
+    };
   }
 
+  // Fuentes de datos (sin localStorage)
   function readProductsInline() {
-    const tag = document.getElementById('woo-products-json');
+    const tag = document.getElementById('woo-products-json'); // <script type="application/json" id="woo-products-json">[...]</script>
     if (!tag) return [];
     try {
       const arr = JSON.parse(tag.textContent || '[]');
@@ -32,7 +38,7 @@
     if (!url) return [];
     try {
       const res = await fetch(url, { credentials: 'omit' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error();
       const data = await res.json();
       const arr = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
       return Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
@@ -59,13 +65,14 @@
     started = true;
 
     const { root } = getRefs();
-    if (!root) return; // seguridad extra
+    if (!root) return;
     if (!root.dataset.idx) root.dataset.idx = '-1'; // mantener XFX hasta primer click
 
     let products = [];
 
     function renderByIndex(nextIndex) {
       if (!products.length) return;
+
       const { root, img, h2 } = getRefs();
       if (!root || !img || !h2) return;
 
@@ -80,6 +87,7 @@
       if (ttl) { h2.textContent = ttl; img.alt = ttl; img.title = ttl; }
       root.dataset.idx = String(i);
 
+      // Precarga de la siguiente imagen
       const pre = pickSrc(products[(i + 1) % len]);
       if (pre) { const im = new Image(); im.src = pre; }
     }
@@ -92,7 +100,7 @@
       renderByIndex((Number.isNaN(current) ? -1 : current) + delta);
     }
 
-    // navegación
+    // Navegación (delegada)
     document.addEventListener('click', (e) => {
       const der = e.target.closest('#motoDer');
       const izq = e.target.closest('#motoIzq');
@@ -104,30 +112,55 @@
       else if (izq) move(-1);
     });
 
-    // recibir datos por evento externo
+    // Recibir datos por evento externo
     document.addEventListener('woo:products:ready', (ev) => {
       const arr = ev?.detail;
       const next = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
-      if (next.length) products = next;
+      if (next.length) {
+        products = next;
+        if (root.dataset.idx === '-1') renderByIndex(0);
+      }
     }, { once: false });
 
-    // re-hidratar cuando todos los componentes ya están montados
-    document.addEventListener('components:all-ready', async () => {
-      const next = await hydrateProducts();
-      if (next.length) products = next;
+    // Hidratar cuando el propio componente queda listo
+    document.addEventListener('component:ready', async ({ detail }) => {
+      if (detail?.id === 'carruselMotos') {
+        const next = await hydrateProducts();
+        if (next.length) {
+          products = next;
+          if (root.dataset.idx === '-1') renderByIndex(0);
+        }
+      }
     }, { once: true });
 
-    // observar si luego le inyectas data-products
+    // Respaldo cuando todos los componentes declaran estar listos
+    document.addEventListener('components:all-ready', async () => {
+      if (products.length) return;
+      const next = await hydrateProducts();
+      if (next.length) {
+        products = next;
+        if (root.dataset.idx === '-1') renderByIndex(0);
+      }
+    }, { once: true });
+
+    // Detectar inyección tardía de data-products en el root
     const mo = new MutationObserver(() => {
       const next = readProductsFromDataset();
-      if (next.length) { products = next; /* mo.disconnect(); */ }
+      if (next.length) {
+        products = next;
+        if (root.dataset.idx === '-1') renderByIndex(0);
+        mo.disconnect();
+      }
     });
     mo.observe(root, { attributes: true, attributeFilter: ['data-products'] });
 
-    // primera hidratación (ya existe el root porque esperamos antes)
+    // Primera hidratación inmediata
     (async () => {
       const next = await hydrateProducts();
-      if (next.length) products = next;
+      if (next.length) {
+        products = next;
+        if (root.dataset.idx === '-1') renderByIndex(0);
+      }
     })();
   }
 
@@ -146,10 +179,7 @@
   }
 
   (async () => {
-    if (document.readyState === 'loading') {
-      await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
-    }
-    await waitForElement('#carruselMotos'); // <-- clave: no inicia hasta que exista
+    await waitForElement('#carruselMotos'); // no inicia hasta que exista
     init();
   })();
 })();
