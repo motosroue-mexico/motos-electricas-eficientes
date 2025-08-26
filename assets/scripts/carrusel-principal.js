@@ -12,16 +12,7 @@
     };
   }
 
-  // ---- Lecturas de productos (cache / inline / data-attr) ----
-  function readProductsFromCache() {
-    try {
-      const cached = localStorage.getItem('woo:products');
-      if (!cached) return [];
-      const arr = JSON.parse(cached);
-      return Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
-    } catch { return []; }
-  }
-
+  // ---- Lecturas de productos (sin localStorage): inline / data-attr / fetch ----
   function readProductsInline() {
     const tag = document.getElementById('woo-products-json'); // <script type="application/json" id="woo-products-json">[...]</script>
     if (!tag) return [];
@@ -40,14 +31,20 @@
     } catch { return []; }
   }
 
-  function readProductsFromAnywhere() {
-    const a = readProductsFromCache();
-    if (a.length) return a;
-    const b = readProductsInline();
-    if (b.length) return b;
-    const c = readProductsFromDataset();
-    if (c.length) return c;
-    return [];
+  async function fetchProductsFromEndpoint() {
+    const { root } = getRefs();
+    const url = root?.dataset?.endpoint || window.WOO_PRODUCTS_ENDPOINT;
+    if (!url) return [];
+    try {
+      const res = await fetch(url, { credentials: 'omit' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const arr = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
+      return Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
+    } catch (err) {
+      console.warn('[carruselMotos] fetch error:', err);
+      return [];
+    }
   }
   // ------------------------------------------------------------
 
@@ -55,8 +52,9 @@
     if (started) return;
     started = true;
 
-    let products = readProductsFromAnywhere();
-    console.debug('[carruselMotos] productos iniciales:', products.length);
+    let products = readProductsInline();
+    if (!products.length) products = readProductsFromDataset();
+    console.debug('[carruselMotos] productos iniciales (sin LS):', products.length);
 
     // Mantener XFX hasta primer click
     const { root } = getRefs();
@@ -92,8 +90,8 @@
       root.dataset.idx = String(i);
 
       // Precarga siguiente
-      const next = products[(i + 1) % len];
-      const pre = pickSrc(next);
+      const nxt = products[(i + 1) % len];
+      const pre = pickSrc(nxt);
       if (pre) { const im = new Image(); im.src = pre; }
     }
 
@@ -120,34 +118,32 @@
       else if (izq) move(-1);
     });
 
-    // Actualiza productos cuando llegue tu evento (mantén XFX hasta click)
+    // Si en tu app externa despachas el evento con los productos, actualiza aquí
     document.addEventListener('woo:products:ready', (ev) => {
       const arr = ev?.detail;
       const next = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
       console.debug('[carruselMotos] woo:products:ready ->', next.length);
       products = next;
-      // persiste para próximas visitas/perfiles del mismo origen
-      try { localStorage.setItem('woo:products', JSON.stringify(next)); } catch {}
     }, { once: false });
 
-    // Si otro tab (mismo origen) actualiza el cache, sincroniza
-    window.addEventListener('storage', (e) => {
-      if (e.key !== 'woo:products') return;
-      try {
-        const arr = JSON.parse(e.newValue || '[]');
-        const next = Array.isArray(arr) ? arr.filter(p => p?.status === 'publish') : [];
-        console.debug('[carruselMotos] storage woo:products ->', next.length);
-        products = next;
-      } catch {}
-    });
+    // Intento de carga desde endpoint si no hubo inline/dataset
+    (async () => {
+      if (!products.length) {
+        const fetched = await fetchProductsFromEndpoint();
+        if (fetched.length) {
+          products = fetched;
+          console.debug('[carruselMotos] fetched ->', products.length);
+        } else {
+          console.warn('[carruselMotos] Sin productos (inline/dataset/fetch falló)');
+        }
+      }
+    })();
 
-    // Si el HTML de #carruselMotos se inserta tarde, solo inicializa idx y reintenta leer data-products
+    // Si el HTML de #carruselMotos se inserta tarde, reintenta leer data-products
     if (!root) {
       const mo = new MutationObserver(() => {
         const { root } = getRefs();
-        if (root && !root.dataset.idx) {
-          root.dataset.idx = '-1';
-        }
+        if (root && !root.dataset.idx) root.dataset.idx = '-1';
         if (root && !products.length) {
           const fromData = readProductsFromDataset();
           if (fromData.length) {
