@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-
 exports.handler = async (event) => {
   // CORS / preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -20,8 +19,8 @@ exports.handler = async (event) => {
       return { statusCode: 405, headers: { 'Access-Control-Allow-Origin': '*' }, body: 'Method Not Allowed' };
     }
 
-    const APPS_SCRIPT_ENDPOINT = process.env.APPS_SCRIPT_ENDPOINT; // tu GAS /exec
-    const RECAPTCHA_SECRET     = process.env.RECAPTCHA_SECRET;     // secret v3
+    const APPS_SCRIPT_ENDPOINT = process.env.APPS_SCRIPT_ENDPOINT; // tu Google Apps Script /exec
+    const RECAPTCHA_SECRET     = process.env.RECAPTCHA_SECRET;     // tu secreto v3
 
     // Parse body
     const ct = String(event.headers['content-type'] || '').toLowerCase();
@@ -32,61 +31,55 @@ exports.handler = async (event) => {
       data = Object.fromEntries(new URLSearchParams(event.body || ''));
     }
 
-    // IP cliente
+    // IP (opcional)
     const clientIp =
       event.headers['x-nf-client-connection-ip'] ||
       event.headers['x-forwarded-for'] ||
       event.headers['client-ip'] || '';
 
-    // Verificar reCAPTCHA (si hay)
-    if (RECAPTCHA_SECRET && data.recaptcha_token) {
-      const resp = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          secret: RECAPTCHA_SECRET,
-          response: data.recaptcha_token,
-          remoteip: clientIp
-        }),
-      });
-      const verify = await resp.json().catch(() => ({}));
-      console.log('[submit-distribuidor] recaptcha:', { ok: verify.success, score: verify.score, host: verify.hostname });
-      if (!verify.success || (typeof verify.score === 'number' && verify.score < 0.5)) {
-        return {
-          statusCode: 400,
-          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ok:false, error:'reCAPTCHA failed' }),
-        };
+    // reCAPTCHA v3
+    if (RECAPTCHA_SECRET) {
+      const tok = data.recaptcha_token || '';
+      if (!tok) console.warn('[submit] sin recaptcha_token (se intentará continuar)');
+      else {
+        const resp = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+          method:'POST',
+          headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ secret: RECAPTCHA_SECRET, response: tok, remoteip: clientIp })
+        });
+        const verify = await resp.json().catch(()=> ({}));
+        console.log('[recaptcha verify]', verify);
+        if (!verify.success) {
+          return {
+            statusCode: 400,
+            headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ok:false, error:'reCAPTCHA failed', verify }),
+          };
+        }
+        // Si quieres forzar score, usa esto luego de probar:
+        // if (typeof verify.score === 'number' && verify.score < 0.5) { ... }
       }
-    } else {
-      console.warn('[submit-distribuidor] reCAPTCHA not verified (missing SECRET or token).');
     }
 
-    // Normalización desde front o desde Mailchimp
-    const name   = data.name   || data.FNAME || '';
-    const email  = data.email  || data.EMAIL || '';
-    const phone  = data.phone  || data.PHONE || '';
-
-    const direccion = data.direccion || data['ADDRESS[addr1]'] || data.ADDRESS?.addr1 || '';
-    const ciudad    = data.ciudad    || data['ADDRESS[city]']  || data.ADDRESS?.city  || '';
-    const estado    = data.estado    || data['ADDRESS[state]'] || data.ADDRESS?.state || '';
-    const cp        = data.cp        || data['ADDRESS[zip]']   || data.ADDRESS?.zip   || '';
-    const pais      = data.pais      || data['ADDRESS[country]'] || data.ADDRESS?.country || '';
-
-    const experiencia      = data.experiencia      || data.EXPERIENCI   || '';
-    const tienda           = data.tienda           || data.TIENDA       || '';
-    const tipo_experiencia = data.tipo_experiencia || data.TIPOEXPERI   || '';
-    const inversion        = data.inversion        || data.INVERSION    || '';
-
-    // Validación mínima (los * del HTML)
-    const required = {
-      name, email, phone,
-      direccion, ciudad, estado, cp, pais,
-      experiencia, tienda, tipo_experiencia, inversion
+    // Normaliza campos
+    const payload = {
+      name:            data.name            || data.FNAME           || '',
+      email:           data.email           || data.EMAIL           || '',
+      phone:           data.phone           || data.PHONE           || '',
+      address_line1:   data.address_line1   || data['ADDRESS[addr1]'] || '',
+      city:            data.city            || data['ADDRESS[city]']  || '',
+      state:           data.state           || data['ADDRESS[state]'] || '',
+      zip:             data.zip             || data['ADDRESS[zip]']   || '',
+      country:         data.country         || data['ADDRESS[country]'] || '',
+      experiencia:     data.experiencia     || data.EXPERIENCI      || '',
+      tienda:          data.tienda          || data.TIENDA          || '',
+      tipo_experiencia:data.tipo_experiencia|| data.TIPOEXPERI      || '',
+      inversion:       data.inversion       || data.INVERSION       || ''
     };
-    const missing = Object.entries(required)
-      .filter(([,v]) => !String(v||'').trim())
-      .map(([k]) => k);
+
+    // Validación mínima
+    const required = ['name','email','phone','address_line1','city','state','zip','experiencia','tienda','tipo_experiencia','inversion'];
+    const missing = required.filter(k => !String(payload[k]||'').trim());
     if (missing.length) {
       return {
         statusCode: 400,
@@ -95,44 +88,35 @@ exports.handler = async (event) => {
       };
     }
 
-    // Mapeo a Apps Script
-    const mapped = {
-      name, email, phone,
-      direccion, ciudad, estado, cp, pais,
-      experiencia, tienda, tipo_experiencia, inversion
-    };
-    console.log('[submit-distribuidor] mapped:', mapped);
-
-    // Forward a GAS
-    let forwarded='skipped', gasStatus=0;
+    // Enviar a Google Apps Script (opcional)
+    let forwarded='skipped', gas_status=0;
     if (APPS_SCRIPT_ENDPOINT) {
       try {
         const res = await fetch(APPS_SCRIPT_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(mapped).toString(),
+          method:'POST',
+          headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(payload).toString()
         });
-        forwarded='sent'; gasStatus = res.status;
-        const text = await res.text().catch(()=> '');
-        console.log('[submit-distribuidor] GAS response:', gasStatus, (text||'').slice(0,240));
+        forwarded='sent'; gas_status = res.status;
+        const txt = await res.text().catch(()=> '');
+        console.log('[GAS]', gas_status, txt.slice(0,240));
       } catch (e) {
-        forwarded='failed';
-        console.error('[submit-distribuidor] GAS forward error:', e);
+        forwarded='failed'; console.error('[GAS error]', e);
       }
     } else {
-      console.error('[submit-distribuidor] APPS_SCRIPT_ENDPOINT no configurado');
+      console.warn('[submit] APPS_SCRIPT_ENDPOINT no configurado (se responde OK igualmente)');
     }
 
     return {
       statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ok:true, forwarded, gas_status: gasStatus }),
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type':'application/json' },
+      body: JSON.stringify({ ok:true, forwarded, gas_status }),
     };
   } catch (err) {
-    console.error('[submit-distribuidor] error:', err);
+    console.error('[submit] error:', err);
     return {
       statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type':'application/json' },
       body: JSON.stringify({ ok:false, error:'Server error' }),
     };
   }
