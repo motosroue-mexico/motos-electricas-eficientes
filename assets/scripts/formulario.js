@@ -138,7 +138,7 @@
       const form = $(FORM_ID);
       submitToMailchimp(form);
       // 3) Redirige a tu página de gracias (ajústala si quieres)
-      window.location.assign('https://motos-roue.netlify.app/gracias62332227');
+      window.location.assign('/gracias62332227');
     })
     .catch(err => {
       console.error('[Front] function ERROR:', err);
