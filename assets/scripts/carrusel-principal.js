@@ -1,12 +1,10 @@
 (() => {
   const ENDPOINT = window.WOO_PRODUCTS_ENDPOINT || '/.netlify/functions/wordpress-products';
 
-  // Estado
   let products = [];
-  let idx = -1;                 // -1 = sigues viendo el HTML inicial (XFX)
+  let idx = -1;
   let pendingFirstClick = false;
 
-  // Refs DOM en el momento de usar
   function refs() {
     const root = document.getElementById('carruselMotos');
     const img  = root?.querySelector('img.motos') || null;
@@ -14,19 +12,16 @@
     return { root, img, h2 };
   }
 
-  // Helpers de datos
   const pickSrc = p =>
     p?.acf?.['imagen-landing']?.url || p?.acf?.['imagen-landing'] || p?.image || '';
   const pickTitle = p =>
     p?.acf?.['nombre-landing'] || p?.name || '';
 
-  // Render
   function render(i) {
     const { root, img, h2 } = refs();
     if (!root || !img || !h2 || !products.length) return;
-
     const len = products.length;
-    i = ((i % len) + len) % len; // normaliza
+    i = ((i % len) + len) % len;
     idx = i;
 
     const p   = products[i];
@@ -38,69 +33,62 @@
 
     root.dataset.idx = String(idx);
 
-    // Precarga siguiente
     const nextSrc = pickSrc(products[(idx + 1) % len]);
     if (nextSrc) { const im = new Image(); im.src = nextSrc; }
   }
 
-  // Click handler
   function step(delta) {
     const { root } = refs();
     if (!root) return;
-
     if (!root.dataset.idx) root.dataset.idx = '-1';
 
-    // Si aún no hay datos, recordamos que hubo primer clic
-    if (!products.length) {
-      pendingFirstClick = true;
-      return;
-    }
-
-    // Primer clic: del -1 pasa SIEMPRE a 0 (sin importar dirección)
-    if (idx < 0) {
-      render(0);
-      return; // ese primer clic solo “posiciona”
-    }
-
-    // Resto de clics: ±1
+    if (!products.length) { pendingFirstClick = true; return; }
+    if (idx < 0) { render(0); return; }
     render(idx + delta);
   }
 
-  // API pública para tus onclick
   window.CarruselRoue = {
     next: () => step(1),
     prev: () => step(-1),
-    init: () => step(0), // opcional
+    init: () => step(0),
   };
 
-  // Fetch inmediato al cargar (no toca data-idx)
   (async () => {
     try {
+      console.time('fetchProducts'); // DEBUG
       const res = await fetch(ENDPOINT, { credentials: 'omit' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
 
       const data = await res.json();
-      const raw  = Array.isArray(data) ? data : (Array.isArray(data?.products) ? data.products : []);
+      const raw  = Array.isArray(data) ? data
+                 : (Array.isArray(data?.products) ? data.products : []);
+
+      // --- DEBUG: expón crudo y loguea ---
+      window.ROUE_RAW_JSON = raw;
+      console.log('[Carrusel] raw length =', Array.isArray(raw) ? raw.length : 'no-array');
+
       products = (raw || []).filter(p =>
         p && (p.status === undefined || p.status === 'publish') && (pickSrc(p) || pickTitle(p))
       );
 
-      // >>> ÚNICA LÍNEA AÑADIDA: JSON completo disponible globalmente
+      // --- DEBUG: expón filtrado y loguea ---
       window.ROUE_PRODUCTS_JSON = products;
+      console.log('[Carrusel] filtered length =', products.length);
 
-      // Si ya hubo clic mientras cargaba, al llegar la data vamos directo al 0
       if (products.length && pendingFirstClick && idx < 0) {
         const { root } = refs();
         if (root && root.dataset.idx === '-1') render(0);
       }
       pendingFirstClick = false;
-    } catch {
-      products = []; // si falla, no habrá navegación
-      window.ROUE_PRODUCTS_JSON = []; // expón vacío también
+      console.timeEnd('fetchProducts'); // DEBUG
+    } catch (err) {
+      products = [];
+      window.ROUE_RAW_JSON = null;
+      window.ROUE_PRODUCTS_JSON = [];
+      console.error('[Carrusel] fetch error:', err); // DEBUG
     }
   })();
 
-  // Marca data-idx = -1 cuando el DOM base esté (sin render automático)
   document.addEventListener('DOMContentLoaded', () => {
     const { root } = refs();
     if (root && !root.dataset.idx) root.dataset.idx = '-1';
