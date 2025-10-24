@@ -1,6 +1,10 @@
 (() => {
   const ENDPOINT = window.WOO_PRODUCTS_ENDPOINT || '/.netlify/functions/wordpress-products';
 
+  // Exponer siempre variables globales (aunque falle el fetch)
+  window.ROUE_RAW_JSON = [];
+  window.ROUE_PRODUCTS_JSON = [];
+
   let products = [];
   let idx = -1;
   let pendingFirstClick = false;
@@ -41,7 +45,6 @@
     const { root } = refs();
     if (!root) return;
     if (!root.dataset.idx) root.dataset.idx = '-1';
-
     if (!products.length) { pendingFirstClick = true; return; }
     if (idx < 0) { render(0); return; }
     render(idx + delta);
@@ -55,7 +58,7 @@
 
   (async () => {
     try {
-      console.time('fetchProducts'); // DEBUG
+      console.time('fetchProducts');
       const res = await fetch(ENDPOINT, { credentials: 'omit' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
 
@@ -63,16 +66,19 @@
       const raw  = Array.isArray(data) ? data
                  : (Array.isArray(data?.products) ? data.products : []);
 
-      // --- DEBUG: expón crudo y loguea ---
+      // Exponer JSON crudo
       window.ROUE_RAW_JSON = raw;
+      console.log('[Carrusel] RAW JSON:', raw);
       console.log('[Carrusel] raw length =', Array.isArray(raw) ? raw.length : 'no-array');
 
+      // Filtrar para el carrusel
       products = (raw || []).filter(p =>
         p && (p.status === undefined || p.status === 'publish') && (pickSrc(p) || pickTitle(p))
       );
 
-      // --- DEBUG: expón filtrado y loguea ---
+      // Exponer JSON filtrado
       window.ROUE_PRODUCTS_JSON = products;
+      console.log('[Carrusel] PRODUCTS JSON:', products);
       console.log('[Carrusel] filtered length =', products.length);
 
       if (products.length && pendingFirstClick && idx < 0) {
@@ -80,12 +86,12 @@
         if (root && root.dataset.idx === '-1') render(0);
       }
       pendingFirstClick = false;
-      console.timeEnd('fetchProducts'); // DEBUG
+      console.timeEnd('fetchProducts');
     } catch (err) {
       products = [];
       window.ROUE_RAW_JSON = null;
       window.ROUE_PRODUCTS_JSON = [];
-      console.error('[Carrusel] fetch error:', err); // DEBUG
+      console.error('[Carrusel] fetch error:', err);
     }
   })();
 
