@@ -1,14 +1,67 @@
 (() => {
   // === CONFIG ===
-  const SITE_KEY  = '6LccHIsqAAAAAAb2LiEEl4pkrdk9S8EJ7l4FQrs4';
+  const SITE_KEY  = '6LccHIsqAAAAAAb2LiEEl4pkrdk9S8EJ7l4FQrs4'; // reCAPTCHA v3 pública
   const FORM_ID   = 'mc-embedded-subscribe-form';
   const BTN_ID    = 'mc-embedded-subscribe';
   const BADGE_SLOT_ID = 'recaptcha-badge-slot';
-  const FUNCTION_ENDPOINT = '/api/submit';
+  const FUNCTION_ENDPOINT = '/api/submit'; // tu función Netlify
   const STATUS_ID = 'form-status';
+  const THANK_YOU_URL = '/gracias62332227'; // tu página de gracias
 
   const $  = id => document.getElementById(id);
   const val = id => ($(id)?.value || '').trim();
+
+  // ========== Estilos mínimos ==========
+  (function injectStyles(){
+    if (document.getElementById('recaptcha-v3-styles')) return;
+    const s=document.createElement('style'); s.id='recaptcha-v3-styles';
+    s.textContent = `
+      iframe[name="mc-submit-bridge"]{display:none;width:0;height:0;border:0}
+      #${BADGE_SLOT_ID}{margin-top:.5rem}
+      #${BADGE_SLOT_ID} .grecaptcha-badge{
+        position:static!important; right:auto!important; bottom:auto!important; box-shadow:none!important; transform:none!important;
+      }
+      .field-error{display:block;margin-top:.25rem;font-size:.8rem;color:#ef4444}
+      .is-invalid{box-shadow:0 0 0 2px rgba(239,68,68,.35)!important;border-color:#ef4444!important}
+      .form-status{margin-top:.5rem;font-size:.9rem;opacity:.85}
+      .is-sending{opacity:.7;pointer-events:none}
+    `;
+    document.head.appendChild(s);
+  })();
+
+  function ensureStatusSlot(){
+    let s = $(STATUS_ID);
+    if(!s){
+      s = document.createElement('p');
+      s.id = STATUS_ID;
+      s.className = 'form-status';
+      const btn=$(BTN_ID);
+      btn?.insertAdjacentElement('afterend', s);
+    }
+    return s;
+  }
+  function setStatus(msg){ ensureStatusSlot().textContent = msg || ''; }
+
+  function ensureBadgeSlot(){
+    if($(BADGE_SLOT_ID)) return $(BADGE_SLOT_ID);
+    const btn=$(BTN_ID); if(!btn) return null;
+    const slot=document.createElement('div'); slot.id=BADGE_SLOT_ID;
+    btn.insertAdjacentElement('afterend', slot); return slot;
+  }
+  function placeV3Badge(){
+    const slot=ensureBadgeSlot(); if(!slot) return;
+    const move=()=>{ const b=document.querySelector('.grecaptcha-badge');
+      if(b && slot.firstChild!==b){ slot.appendChild(b); b.style.position='static'; return true; }
+      return false;
+    };
+    if(move()) return; let n=0; const id=setInterval(()=>{ if(move()||++n>30) clearInterval(id); },100);
+  }
+
+  // ======= Validaciones =======
+  const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+  const RE_PHONE = /^[0-9+\-\s()]{8,}$/;
+  const RE_ZIP   = /^[0-9A-Za-z\- ]{4,10}$/;
+  const RE_TEXT  = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9.,\-#/\s]{2,}$/;
 
   function ensureAfter(el){ return el?.parentElement || el; }
   function setError(id, msg){
@@ -30,138 +83,6 @@
     if(s) s.remove();
   }
   function clearErrors(ids){ ids.forEach(clearError); }
-
-  function ensureStatusSlot(){
-    let s = $(STATUS_ID);
-    if(!s){
-      s = document.createElement('p');
-      s.id = STATUS_ID;
-      s.className = 'form-status';
-      const btn=$(BTN_ID);
-      btn?.insertAdjacentElement('afterend', s);
-    }
-    return s;
-  }
-  function setStatus(msg){
-    const s = ensureStatusSlot();
-    s.textContent = msg || '';
-  }
-
-  (function injectStyles(){
-    if (document.getElementById('recaptcha-v3-styles')) return;
-    const s=document.createElement('style'); s.id='recaptcha-v3-styles';
-    s.textContent = `
-      iframe[name="mc-submit-bridge"]{display:none;width:0;height:0;border:0}
-      #${BADGE_SLOT_ID}{margin-top:.5rem}
-      #${BADGE_SLOT_ID} .grecaptcha-badge{
-        position:static!important; right:auto!important; bottom:auto!important; box-shadow:none!important;
-        transform:none!important;
-      }
-      .field-error{display:block;margin-top:.25rem;font-size:.8rem;color:#ef4444}
-      .is-invalid{box-shadow:0 0 0 2px rgba(239,68,68,.35)!important;border-color:#ef4444!important}
-      .form-status{margin-top:.5rem;font-size:.9rem;opacity:.85}
-      .is-sending{opacity:.7;pointer-events:none}
-    `;
-    document.head.appendChild(s);
-  })();
-
-  function ensureBadgeSlot(){
-    if($(BADGE_SLOT_ID)) return $(BADGE_SLOT_ID);
-    const btn=$(BTN_ID); if(!btn) return null;
-    const slot=document.createElement('div'); slot.id=BADGE_SLOT_ID;
-    btn.insertAdjacentElement('afterend', slot); return slot;
-  }
-  function placeV3Badge(){
-    const slot=ensureBadgeSlot(); if(!slot) return;
-    const move=()=>{ const b=document.querySelector('.grecaptcha-badge');
-      if(b && slot.firstChild!==b){ slot.appendChild(b); b.style.position='static'; return true; }
-      return false;
-    };
-    if(move()) return; let n=0; const id=setInterval(()=>{ if(move()||++n>30) clearInterval(id); },100);
-  }
-
-  async function ensureRecaptchaReady() {
-    if (window.grecaptcha && grecaptcha.ready) {
-      await new Promise(res => grecaptcha.ready(res));
-      return;
-    }
-    await new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = 'https://www.google.com/recaptcha/api.js?render='+encodeURIComponent(SITE_KEY);
-      s.async = true; s.defer = true;
-      s.onload = () => {
-        if (window.grecaptcha && grecaptcha.ready) {
-          grecaptcha.ready(resolve);
-        } else {
-          reject(new Error('grecaptcha no expone ready()'));
-        }
-      };
-      s.onerror = () => reject(new Error('No se pudo cargar api.js de reCAPTCHA'));
-      document.head.appendChild(s);
-    });
-  }
-  async function getTokenV3() {
-    try {
-      await ensureRecaptchaReady();
-      const t = await grecaptcha.execute(SITE_KEY, { action:'submit' });
-      console.log('[reCAPTCHA v3] token length:', (t||'').length);
-      return t || '';
-    } catch (e) {
-      console.warn('[reCAPTCHA v3] indisponible:', e);
-      return '';
-    }
-  }
-
-  // === Mailchimp bridge con confirmación ===
-  function ensureMcIframe(){
-    let f=document.querySelector('iframe[name="mc-submit-bridge"]');
-    if(!f){
-      f=document.createElement('iframe');
-      f.name='mc-submit-bridge';
-      f.style.display='none';
-      document.body.appendChild(f);
-    }
-    return f;
-  }
-
-  // DEVUELVE una Promesa que se resuelve en load o por timeout
-  function submitToMailchimp(form){
-    return new Promise((resolve) => {
-      const iframe = ensureMcIframe();
-
-      // Limpia listeners previos
-      const handler = () => {
-        iframe.removeEventListener('load', handler);
-        resolve('loaded');
-      };
-      iframe.addEventListener('load', handler);
-
-      // Fallback por si no dispara load
-      const fallback = setTimeout(() => {
-        iframe.removeEventListener('load', handler);
-        resolve('timeout');
-      }, 1200); // 1.2s suele ser suficiente
-
-      // Enviar
-      const originalTarget=form.getAttribute('target');
-      try {
-        form.setAttribute('target','mc-submit-bridge');
-        form.submit();
-      } finally {
-        // Deja un microtask antes de restaurar para no interferir
-        setTimeout(() => {
-          originalTarget ? form.setAttribute('target', originalTarget) : form.removeAttribute('target');
-          clearTimeout(fallback);
-        }, 50);
-      }
-    });
-  }
-
-  // ======= Validaciones =======
-  const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-  const RE_PHONE = /^[0-9+\-\s()]{8,}$/;
-  const RE_ZIP   = /^[0-9A-Za-z\- ]{4,10}$/;
-  const RE_TEXT  = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9.,\-#/\s]{2,}$/;
 
   function validateAll(){
     const needed = [
@@ -201,6 +122,57 @@
     return ok;
   }
 
+  // ====== reCAPTCHA v3 ======
+  async function ensureRecaptchaReady() {
+    if (window.grecaptcha && grecaptcha.ready) {
+      await new Promise(res => grecaptcha.ready(res)); return;
+    }
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://www.google.com/recaptcha/api.js?render='+encodeURIComponent(SITE_KEY);
+      s.async = true; s.defer = true;
+      s.onload = () => (window.grecaptcha && grecaptcha.ready) ? grecaptcha.ready(resolve) : reject(new Error('grecaptcha no expone ready()'));
+      s.onerror = () => reject(new Error('No se pudo cargar api.js de reCAPTCHA'));
+      document.head.appendChild(s);
+    });
+  }
+  async function getTokenV3() {
+    try { await ensureRecaptchaReady(); return await grecaptcha.execute(SITE_KEY, { action:'submit' }); }
+    catch { return ''; }
+  }
+
+  // ====== Mailchimp: fetch no-cors + fallback iframe ======
+  function ensureMcIframe(){
+    let f=document.querySelector('iframe[name="mc-submit-bridge"]');
+    if(!f){ f=document.createElement('iframe'); f.name='mc-submit-bridge'; f.style.display='none'; document.body.appendChild(f); }
+    return f;
+  }
+  function submitMailchimpViaIframe(form){
+    return new Promise((resolve)=>{
+      const iframe = ensureMcIframe();
+      const onload = () => { iframe.removeEventListener('load', onload); resolve('loaded'); };
+      iframe.addEventListener('load', onload);
+      const originalTarget=form.getAttribute('target');
+      try { form.setAttribute('target','mc-submit-bridge'); form.submit(); }
+      finally {
+        setTimeout(()=>{ originalTarget ? form.setAttribute('target', originalTarget) : form.removeAttribute('target'); }, 50);
+        setTimeout(()=>{ iframe.removeEventListener('load', onload); resolve('timeout'); }, 1500);
+      }
+    });
+  }
+  async function submitMailchimp(form){
+    // 1) Intento con fetch no-cors (como tu código que funcionaba)
+    try {
+      const fd = new FormData(form); // incluye TODOS los campos/hidden exactos del embed
+      await fetch(form.action, { method:'POST', body: fd, mode:'no-cors' });
+      // No se puede leer la respuesta en no-cors, pero el POST se envía.
+      return 'nocors';
+    } catch (e) {
+      // 2) Fallback: iframe + submit tradicional
+      return await submitMailchimpViaIframe(form);
+    }
+  }
+
   async function onSubmit(ev){
     ev.preventDefault();
 
@@ -216,6 +188,7 @@
 
     const token = await getTokenV3();
 
+    // Payload (llaves en español para tu backend)
     const payload = {
       name: val('mce-FNAME'),
       email: val('mce-EMAIL'),
@@ -233,6 +206,7 @@
       _meta: { url: location.href, ua: navigator.userAgent, ts: new Date().toISOString() }
     };
 
+    // 1) Google (tu backend → GAS)
     fetch(FUNCTION_ENDPOINT, {
       method:'POST',
       headers:{ 'Content-Type':'application/json' },
@@ -244,12 +218,12 @@
       try { return JSON.parse(t); } catch { return { ok:true, raw:t }; }
     })
     .then(async () => {
-      // 1) Enviar a Mailchimp y ESPERAR confirmación/timeout
+      // 2) Mailchimp (desde el navegador)
       const form = $(FORM_ID);
-      await submitToMailchimp(form);
+      await submitMailchimp(form);
 
-      // 2) Redirigir a gracias (ya con MC disparado)
-      window.location.assign('/gracias62332227');
+      // 3) Redirigir a gracias
+      window.location.assign(THANK_YOU_URL);
     })
     .catch(err => {
       console.error('[Front] function ERROR:', err);
@@ -269,3 +243,4 @@
 
   (document.readyState==='loading') ? document.addEventListener('DOMContentLoaded', mount) : mount();
 })();
+

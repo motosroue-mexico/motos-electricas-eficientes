@@ -1,6 +1,4 @@
 /* eslint-disable no-console */
-const crypto = require('crypto');
-
 exports.handler = async (event) => {
   // CORS / preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -23,13 +21,6 @@ exports.handler = async (event) => {
 
     const APPS_SCRIPT_ENDPOINT = process.env.APPS_SCRIPT_ENDPOINT; // tu Google Apps Script /exec
     const RECAPTCHA_SECRET     = process.env.RECAPTCHA_SECRET;     // tu secreto v3
-
-    // === Mailchimp embebido (SIN env vars) ===
-    const MC_FORM_ACTION = 'https://rouebikes.us14.list-manage.com/subscribe/post?u=d61f6f82d65397ef994986f0c&id=69d60f1db1&f_id=004196e0f0';
-    // Honeypot del form embebido:
-    const MC_HONEYPOT    = 'b_d61f6f82d65397ef994986f0c_69d60f1db1';
-    // Tag numérica del form embebido:
-    const MC_TAGS_VALUE  = '12496916';
 
     // Parse body
     const ct = String(event.headers['content-type'] || '').toLowerCase();
@@ -69,7 +60,7 @@ exports.handler = async (event) => {
       }
     }
 
-    // Normaliza campos (preferencia español)
+    // Normaliza campos (llaves en español)
     const payload = {
       name:    data.name  || data.FNAME  || '',
       email:   data.email || data.EMAIL  || '',
@@ -102,7 +93,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // ---- 1) Forward a Google Apps Script (opcional) ----
+    // ---- Forward a Google Apps Script (opcional) ----
     let forwarded='skipped', gas_status=0;
     if (APPS_SCRIPT_ENDPOINT) {
       const forwardData = {
@@ -118,7 +109,8 @@ exports.handler = async (event) => {
         tienda: payload.tienda,
         tipoExperiencia: payload.tipoExperiencia,
         inversion: payload.inversion,
-        address_line1: payload.direccion, // alias legacy
+        // alias legacy por si tu GAS ya los usaba
+        address_line1: payload.direccion,
         city: payload.ciudad,
         state: payload.estado,
         tipo_experiencia: payload.tipoExperiencia,
@@ -141,50 +133,10 @@ exports.handler = async (event) => {
       console.warn('[submit] APPS_SCRIPT_ENDPOINT no configurado (se responde OK igualmente)');
     }
 
-    // ---- 2) Forward DIRECTO al formulario embebido de Mailchimp ----
-    // Enviamos exactamente los nombres que espera el embed:
-    const mcBody = new URLSearchParams({
-      EMAIL: payload.email,
-      FNAME: payload.name,
-      PHONE: payload.phone,
-      'ADDRESS[addr1]': payload.direccion,
-      'ADDRESS[city]' : payload.ciudad,
-      'ADDRESS[state]': payload.estado,
-      'ADDRESS[zip]'  : payload.zip,
-      'ADDRESS[country]': payload.country,
-      EXPERIENCI: payload.experiencia,
-      TIENDA: payload.tienda,
-      TIPOEXPERI: payload.tipoExperiencia,
-      INVERSION: payload.inversion,
-      tags: MC_TAGS_VALUE,
-      [MC_HONEYPOT]: '' // honeypot vacío
-    }).toString();
-
-    let mc_status=0, mc_ok=false;
-    try {
-      const res = await fetch(MC_FORM_ACTION, {
-        method:'POST',
-        headers: {
-          'Content-Type':'application/x-www-form-urlencoded',
-          // Algunos endpoints responden distinto con/ sin Referer:
-          'Referer': 'https://rouebikes.us14.list-manage.com/',
-          'User-Agent': 'NetlifyFunction/1.0'
-        },
-        body: mcBody
-      });
-      mc_status = res.status;
-      const html = await res.text().catch(()=> '');
-      // Heurística básica: si Mailchimp devuelve página con "success" o sin error obvio
-      mc_ok = mc_status >= 200 && mc_status < 400;
-      console.log('[MC FORM]', mc_status, html.slice(0,200));
-    } catch (e) {
-      console.error('[MC FORM error]', e);
-    }
-
     return {
       statusCode: 200,
       headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type':'application/json' },
-      body: JSON.stringify({ ok:true, forwarded, gas_status, mc_form: { ok: mc_ok, status: mc_status } }),
+      body: JSON.stringify({ ok:true, forwarded, gas_status }),
     };
   } catch (err) {
     console.error('[submit] error:', err);
