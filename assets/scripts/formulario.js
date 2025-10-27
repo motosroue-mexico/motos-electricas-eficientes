@@ -1,16 +1,15 @@
 (() => {
   // === CONFIG ===
-  const SITE_KEY  = '6LccHIsqAAAAAAb2LiEEl4pkrdk9S8EJ7l4FQrs4'; // tu v3 pública
+  const SITE_KEY  = '6LccHIsqAAAAAAb2LiEEl4pkrdk9S8EJ7l4FQrs4';
   const FORM_ID   = 'mc-embedded-subscribe-form';
   const BTN_ID    = 'mc-embedded-subscribe';
   const BADGE_SLOT_ID = 'recaptcha-badge-slot';
-  const FUNCTION_ENDPOINT = '/api/submit'; // cambia si tu función es otra (ej. /api/submit-distribuidor)
-  const STATUS_ID = 'form-status'; // mensaje pequeño "Enviando…"
+  const FUNCTION_ENDPOINT = '/api/submit';
+  const STATUS_ID = 'form-status';
 
   const $  = id => document.getElementById(id);
   const val = id => ($(id)?.value || '').trim();
 
-  // ======= Helpers de errores/estatus =======
   function ensureAfter(el){ return el?.parentElement || el; }
   function setError(id, msg){
     const el = $(id); if(!el) return;
@@ -48,7 +47,6 @@
     s.textContent = msg || '';
   }
 
-  // Estilos mínimos / badge estático / errores
   (function injectStyles(){
     if (document.getElementById('recaptcha-v3-styles')) return;
     const s=document.createElement('style'); s.id='recaptcha-v3-styles';
@@ -82,7 +80,6 @@
     if(move()) return; let n=0; const id=setInterval(()=>{ if(move()||++n>30) clearInterval(id); },100);
   }
 
-  // Carga/ready de v3
   async function ensureRecaptchaReady() {
     if (window.grecaptcha && grecaptcha.ready) {
       await new Promise(res => grecaptcha.ready(res));
@@ -115,23 +112,56 @@
     }
   }
 
-  // Mailchimp bridge en paralelo (sin bloquear UX)
+  // === Mailchimp bridge con confirmación ===
   function ensureMcIframe(){
     let f=document.querySelector('iframe[name="mc-submit-bridge"]');
-    if(!f){ f=document.createElement('iframe'); f.name='mc-submit-bridge'; document.body.appendChild(f); }
+    if(!f){
+      f=document.createElement('iframe');
+      f.name='mc-submit-bridge';
+      f.style.display='none';
+      document.body.appendChild(f);
+    }
     return f;
   }
+
+  // DEVUELVE una Promesa que se resuelve en load o por timeout
   function submitToMailchimp(form){
-    const originalTarget=form.getAttribute('target');
-    try { ensureMcIframe(); form.setAttribute('target','mc-submit-bridge'); form.submit(); }
-    finally { originalTarget ? form.setAttribute('target', originalTarget) : form.removeAttribute('target'); }
+    return new Promise((resolve) => {
+      const iframe = ensureMcIframe();
+
+      // Limpia listeners previos
+      const handler = () => {
+        iframe.removeEventListener('load', handler);
+        resolve('loaded');
+      };
+      iframe.addEventListener('load', handler);
+
+      // Fallback por si no dispara load
+      const fallback = setTimeout(() => {
+        iframe.removeEventListener('load', handler);
+        resolve('timeout');
+      }, 1200); // 1.2s suele ser suficiente
+
+      // Enviar
+      const originalTarget=form.getAttribute('target');
+      try {
+        form.setAttribute('target','mc-submit-bridge');
+        form.submit();
+      } finally {
+        // Deja un microtask antes de restaurar para no interferir
+        setTimeout(() => {
+          originalTarget ? form.setAttribute('target', originalTarget) : form.removeAttribute('target');
+          clearTimeout(fallback);
+        }, 50);
+      }
+    });
   }
 
-  // ======= Validaciones de tipo =======
+  // ======= Validaciones =======
   const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-  const RE_PHONE = /^[0-9+\-\s()]{8,}$/; // mínimo 8 caracteres
+  const RE_PHONE = /^[0-9+\-\s()]{8,}$/;
   const RE_ZIP   = /^[0-9A-Za-z\- ]{4,10}$/;
-  const RE_TEXT  = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9.,\-#/\s]{2,}$/; // para address/city/state
+  const RE_TEXT  = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9.,\-#/\s]{2,}$/;
 
   function validateAll(){
     const needed = [
@@ -139,7 +169,6 @@
       'mce-ADDRESS-addr1', 'mce-ADDRESS-city', 'mce-ADDRESS-state', 'mce-ADDRESS-zip',
       'mce-EXPERIENCI', 'mce-TIENDA', 'mce-TIPOEXPERI', 'mce-INVERSION'
     ];
-
     clearErrors(needed);
     let ok = true;
 
@@ -162,7 +191,6 @@
       const v = val(r.id);
       if(!r.test(v)){ setError(r.id, r.msg); ok = false; }
     }
-
     if(!ok){
       needed.forEach(id => {
         const el=$(id);
@@ -170,7 +198,6 @@
         if(!v) setError(id, 'Campo obligatorio.');
       });
     }
-
     return ok;
   }
 
@@ -189,7 +216,6 @@
 
     const token = await getTokenV3();
 
-    // ======= TU PAYLOAD (en español) =======
     const payload = {
       name: val('mce-FNAME'),
       email: val('mce-EMAIL'),
@@ -198,7 +224,7 @@
       ciudad: val('mce-ADDRESS-city'),
       estado: val('mce-ADDRESS-state'),
       zip: val('mce-ADDRESS-zip'),
-      country: val('mce-ADDRESS-country'), // si el select existe en tu HTML
+      country: val('mce-ADDRESS-country'),
       experiencia: val('mce-EXPERIENCI'),
       tienda: val('mce-TIENDA'),
       tipoExperiencia: val('mce-TIPOEXPERI'),
@@ -207,7 +233,6 @@
       _meta: { url: location.href, ua: navigator.userAgent, ts: new Date().toISOString() }
     };
 
-    // 1) Envío a tu función
     fetch(FUNCTION_ENDPOINT, {
       method:'POST',
       headers:{ 'Content-Type':'application/json' },
@@ -218,11 +243,12 @@
       if(!r.ok) throw new Error(t||'Function error');
       try { return JSON.parse(t); } catch { return { ok:true, raw:t }; }
     })
-    .then(() => {
-      // 2) Mailchimp por iframe (en paralelo)
+    .then(async () => {
+      // 1) Enviar a Mailchimp y ESPERAR confirmación/timeout
       const form = $(FORM_ID);
-      submitToMailchimp(form);
-      // 3) Redirección a gracias
+      await submitToMailchimp(form);
+
+      // 2) Redirigir a gracias (ya con MC disparado)
       window.location.assign('/gracias62332227');
     })
     .catch(err => {
