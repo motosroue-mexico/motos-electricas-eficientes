@@ -1,5 +1,9 @@
 /* CSS PERSONALIZADO */
 
+#formulario form small{
+    margin: 0px;
+}
+
 /* ===== Mobile ===== */
 @media (max-width: 767.98px) {
   /* XFX */
@@ -31,6 +35,14 @@
 
   /* ZS */
   #carruselMotos:has(img[alt="ZS" i]) h2 { font-size: 180px; }
+
+  /* P200X */
+  #carruselMotos:has(img[alt="P200X" i]) h2 { font-size: 60px; }
+
+  /* ECOX */
+  #carruselMotos:has(img[alt="ECOX" i]) h2 { font-size: 60px; }
+
+
 }
 
 /* ===== Desktop ===== */
@@ -55,6 +67,12 @@
 
   /* TALARIA */
   #carruselMotos:has(img[alt="TALARIA" i]) h2 { font-size: 84px; }
+
+  /* P200X */
+  #carruselMotos:has(img[alt="P200X" i]) h2 { font-size: 100px; }
+
+  /* ECOX */
+  #carruselMotos:has(img[alt="ECOX" i]) h2 { font-size: 120px; }
 
   /* ZL2 */
   #carruselMotos:has(img[alt="ZL2" i]) h2 { font-size: 195px; }
@@ -578,7 +596,7 @@ footer nav {
 }
 @media (min-width:768px){
     #carruselMotos h2 {
-        font-size: 195px;
+        font-size: 70px;
     }
     #carruselMotos .botones {
         left: -24px;
@@ -642,7 +660,7 @@ footer nav {
         height: auto;
     }
     #carruselMotos h2 {
-        font-size: 130px;
+        font-size: 50px;
     }
     #carruselMotos .botones {
         left: 24px;

@@ -5,11 +5,56 @@
   const BTN_ID    = 'mc-embedded-subscribe';
   const BADGE_SLOT_ID = 'recaptcha-badge-slot';
   const FUNCTION_ENDPOINT = '/api/submit'; // cambia si tu función es otra (ej. /api/submit-distribuidor)
+  const STATUS_ID = 'form-status'; // mensaje pequeño "Enviando..."
 
   const $  = id => document.getElementById(id);
   const val = id => ($(id)?.value || '').trim();
 
-  // Estilos mínimos / badge estático
+  // ======= Helpers de errores/estatus =======
+  function ensureAfter(el){
+    // Punto donde anclar mensajes de error (después del input)
+    return el?.parentElement || el;
+  }
+  function setError(id, msg){
+    const el = $(id); if(!el) return;
+    el.classList.add('is-invalid');
+    let s = document.getElementById('err-'+id);
+    if(!s){
+      s = document.createElement('small');
+      s.id = 'err-'+id;
+      s.className = 'field-error';
+      ensureAfter(el).appendChild(s);
+    }
+    s.textContent = msg || 'Campo obligatorio.';
+  }
+  function clearError(id){
+    const el = $(id); if(!el) return;
+    el.classList.remove('is-invalid');
+    const s = document.getElementById('err-'+id);
+    if(s) s.remove();
+  }
+  function clearErrors(ids){
+    ids.forEach(clearError);
+  }
+
+  function ensureStatusSlot(){
+    let s = $(STATUS_ID);
+    if(!s){
+      s = document.createElement('p');
+      s.id = STATUS_ID;
+      s.className = 'form-status';
+      const btn=$(BTN_ID);
+      // Inserta debajo del botón
+      btn?.insertAdjacentElement('afterend', s);
+    }
+    return s;
+  }
+  function setStatus(msg){
+    const s = ensureStatusSlot();
+    s.textContent = msg || '';
+  }
+
+  // Estilos mínimos / badge estático / errores
   (function injectStyles(){
     if (document.getElementById('recaptcha-v3-styles')) return;
     const s=document.createElement('style'); s.id='recaptcha-v3-styles';
@@ -20,6 +65,10 @@
         position:static!important; right:auto!important; bottom:auto!important; box-shadow:none!important;
         transform:none!important;
       }
+      .field-error{display:block;margin-top:.25rem;font-size:.8rem;color:#ef4444}
+      .is-invalid{box-shadow:0 0 0 2px rgba(239,68,68,.35)!important;border-color:#ef4444!important}
+      .form-status{margin-top:.5rem;font-size:.9rem;opacity:.85}
+      .is-sending{opacity:.7;pointer-events:none}
     `;
     document.head.appendChild(s);
   })();
@@ -84,22 +133,75 @@
     finally { originalTarget ? form.setAttribute('target', originalTarget) : form.removeAttribute('target'); }
   }
 
-  async function onSubmit(ev){
-    ev.preventDefault();
+  // ======= Validaciones de tipo =======
+  const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+  const RE_PHONE = /^[0-9+\-\s()]{8,}$/; // mínimo 8 caracteres (permite +, -, espacios, paréntesis)
+  const RE_ZIP   = /^[0-9A-Za-z\- ]{4,10}$/;
+  const RE_TEXT  = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9.,\-#/\s]{2,}$/; // para address/city/state
 
-    // Validación mínima (ajústala a lo que necesites)
+  function validateAll(){
     const needed = [
       'mce-FNAME', 'mce-EMAIL', 'mce-PHONE',
       'mce-ADDRESS-addr1', 'mce-ADDRESS-city', 'mce-ADDRESS-state', 'mce-ADDRESS-zip',
       'mce-EXPERIENCI', 'mce-TIENDA', 'mce-TIPOEXPERI', 'mce-INVERSION'
     ];
+
+    // limpia estilos previos
+    clearErrors(needed);
+
     let ok = true;
-    needed.forEach(id => {
-      const el=$(id); const v = el ? (el.value||'').trim() : '';
-      if (!v) { ok=false; el && (el.style.boxShadow='0 0 4px #ef4444'); }
-      else { el && (el.style.boxShadow='0 0 0 #0000'); }
-    });
-    if(!ok){ alert('Por favor completa los campos obligatorios.'); return; }
+
+    // Reglas por campo
+    const rules = [
+      { id:'mce-FNAME',        test: v => v.length >= 2,                          msg:'Escribe tu nombre completo.' },
+      { id:'mce-EMAIL',        test: v => RE_EMAIL.test(v),                       msg:'Correo inválido.' },
+      { id:'mce-PHONE',        test: v => RE_PHONE.test(v),                       msg:'Teléfono inválido (mín. 8 dígitos).' },
+      { id:'mce-ADDRESS-addr1',test: v => RE_TEXT.test(v) && v.length >= 5,      msg:'Dirección incompleta.' },
+      { id:'mce-ADDRESS-city', test: v => RE_TEXT.test(v),                        msg:'Ciudad inválida.' },
+      { id:'mce-ADDRESS-state',test: v => RE_TEXT.test(v),                        msg:'Estado inválido.' },
+      { id:'mce-ADDRESS-zip',  test: v => RE_ZIP.test(v),                         msg:'Código postal inválido.' },
+      // country puede ser opcional, pero si existe, pídele algo no vacío:
+      { id:'mce-ADDRESS-country', test: v => ($( 'mce-ADDRESS-country') ? v.length>0 : true), msg:'Selecciona país.' },
+      { id:'mce-EXPERIENCI',   test: v => v.length > 0,                           msg:'Selecciona tu experiencia.' },
+      { id:'mce-TIENDA',       test: v => v.length > 0,                           msg:'Indica si tienes tienda.' },
+      { id:'mce-TIPOEXPERI',   test: v => v.length > 0,                           msg:'Selecciona el tipo de experiencia.' },
+      { id:'mce-INVERSION',    test: v => v.length > 0,                           msg:'Selecciona tu inversión estimada.' },
+    ];
+
+    for (const r of rules){
+      const v = val(r.id);
+      if(!r.test(v)){
+        setError(r.id, r.msg);
+        ok = false;
+      }
+    }
+
+    // Además, marca visiblemente los vacíos (por si no entraron a una regla)
+    if(!ok){
+      needed.forEach(id => {
+        const el=$(id);
+        const v = el ? (el.value||'').trim() : '';
+        if(!v) setError(id, 'Campo obligatorio.');
+      });
+    }
+
+    return ok;
+  }
+
+  async function onSubmit(ev){
+    ev.preventDefault();
+
+    // Validación completa
+    if(!validateAll()){
+      alert('Por favor corrige los campos marcados en rojo e intenta nuevamente.');
+      return;
+    }
+
+    // Estado de envío
+    const btn = $(BTN_ID);
+    btn?.classList.add('is-sending');
+    btn?.setAttribute('aria-busy','true');
+    setStatus('Enviando…');
 
     // Token v3
     const token = await getTokenV3();
@@ -143,6 +245,9 @@
     .catch(err => {
       console.error('[Front] function ERROR:', err);
       alert('No fue posible enviar tu información. Intenta nuevamente.');
+      setStatus('Ocurrió un error. Por favor intenta de nuevo.');
+      btn?.classList.remove('is-sending');
+      btn?.removeAttribute('aria-busy');
     });
   }
 
