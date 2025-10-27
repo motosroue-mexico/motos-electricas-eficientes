@@ -5,16 +5,13 @@
   const BTN_ID    = 'mc-embedded-subscribe';
   const BADGE_SLOT_ID = 'recaptcha-badge-slot';
   const FUNCTION_ENDPOINT = '/api/submit'; // cambia si tu función es otra (ej. /api/submit-distribuidor)
-  const STATUS_ID = 'form-status'; // mensaje pequeño "Enviando..."
+  const STATUS_ID = 'form-status'; // mensaje pequeño "Enviando…"
 
   const $  = id => document.getElementById(id);
   const val = id => ($(id)?.value || '').trim();
 
   // ======= Helpers de errores/estatus =======
-  function ensureAfter(el){
-    // Punto donde anclar mensajes de error (después del input)
-    return el?.parentElement || el;
-  }
+  function ensureAfter(el){ return el?.parentElement || el; }
   function setError(id, msg){
     const el = $(id); if(!el) return;
     el.classList.add('is-invalid');
@@ -33,9 +30,7 @@
     const s = document.getElementById('err-'+id);
     if(s) s.remove();
   }
-  function clearErrors(ids){
-    ids.forEach(clearError);
-  }
+  function clearErrors(ids){ ids.forEach(clearError); }
 
   function ensureStatusSlot(){
     let s = $(STATUS_ID);
@@ -44,7 +39,6 @@
       s.id = STATUS_ID;
       s.className = 'form-status';
       const btn=$(BTN_ID);
-      // Inserta debajo del botón
       btn?.insertAdjacentElement('afterend', s);
     }
     return s;
@@ -135,7 +129,7 @@
 
   // ======= Validaciones de tipo =======
   const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-  const RE_PHONE = /^[0-9+\-\s()]{8,}$/; // mínimo 8 caracteres (permite +, -, espacios, paréntesis)
+  const RE_PHONE = /^[0-9+\-\s()]{8,}$/; // mínimo 8 caracteres
   const RE_ZIP   = /^[0-9A-Za-z\- ]{4,10}$/;
   const RE_TEXT  = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9.,\-#/\s]{2,}$/; // para address/city/state
 
@@ -146,12 +140,9 @@
       'mce-EXPERIENCI', 'mce-TIENDA', 'mce-TIPOEXPERI', 'mce-INVERSION'
     ];
 
-    // limpia estilos previos
     clearErrors(needed);
-
     let ok = true;
 
-    // Reglas por campo
     const rules = [
       { id:'mce-FNAME',        test: v => v.length >= 2,                          msg:'Escribe tu nombre completo.' },
       { id:'mce-EMAIL',        test: v => RE_EMAIL.test(v),                       msg:'Correo inválido.' },
@@ -160,7 +151,6 @@
       { id:'mce-ADDRESS-city', test: v => RE_TEXT.test(v),                        msg:'Ciudad inválida.' },
       { id:'mce-ADDRESS-state',test: v => RE_TEXT.test(v),                        msg:'Estado inválido.' },
       { id:'mce-ADDRESS-zip',  test: v => RE_ZIP.test(v),                         msg:'Código postal inválido.' },
-      // country puede ser opcional, pero si existe, pídele algo no vacío:
       { id:'mce-ADDRESS-country', test: v => ($( 'mce-ADDRESS-country') ? v.length>0 : true), msg:'Selecciona país.' },
       { id:'mce-EXPERIENCI',   test: v => v.length > 0,                           msg:'Selecciona tu experiencia.' },
       { id:'mce-TIENDA',       test: v => v.length > 0,                           msg:'Indica si tienes tienda.' },
@@ -170,13 +160,9 @@
 
     for (const r of rules){
       const v = val(r.id);
-      if(!r.test(v)){
-        setError(r.id, r.msg);
-        ok = false;
-      }
+      if(!r.test(v)){ setError(r.id, r.msg); ok = false; }
     }
 
-    // Además, marca visiblemente los vacíos (por si no entraron a una regla)
     if(!ok){
       needed.forEach(id => {
         const el=$(id);
@@ -191,40 +177,37 @@
   async function onSubmit(ev){
     ev.preventDefault();
 
-    // Validación completa
     if(!validateAll()){
       alert('Por favor corrige los campos marcados en rojo e intenta nuevamente.');
       return;
     }
 
-    // Estado de envío
     const btn = $(BTN_ID);
     btn?.classList.add('is-sending');
     btn?.setAttribute('aria-busy','true');
     setStatus('Enviando…');
 
-    // Token v3
     const token = await getTokenV3();
 
-    // Payload para tu Netlify Function
+    // ======= TU PAYLOAD (en español) =======
     const payload = {
       name: val('mce-FNAME'),
       email: val('mce-EMAIL'),
       phone: val('mce-PHONE'),
-      address_line1: val('mce-ADDRESS-addr1'),
-      city: val('mce-ADDRESS-city'),
-      state: val('mce-ADDRESS-state'),
+      direccion: val('mce-ADDRESS-addr1'),
+      ciudad: val('mce-ADDRESS-city'),
+      estado: val('mce-ADDRESS-state'),
       zip: val('mce-ADDRESS-zip'),
       country: val('mce-ADDRESS-country'), // si el select existe en tu HTML
       experiencia: val('mce-EXPERIENCI'),
       tienda: val('mce-TIENDA'),
-      tipo_experiencia: val('mce-TIPOEXPERI'),
+      tipoExperiencia: val('mce-TIPOEXPERI'),
       inversion: val('mce-INVERSION'),
       recaptcha_token: token,
       _meta: { url: location.href, ua: navigator.userAgent, ts: new Date().toISOString() }
     };
 
-    // 1) Disparo a tu función (con recaptcha_token)
+    // 1) Envío a tu función
     fetch(FUNCTION_ENDPOINT, {
       method:'POST',
       headers:{ 'Content-Type':'application/json' },
@@ -236,10 +219,10 @@
       try { return JSON.parse(t); } catch { return { ok:true, raw:t }; }
     })
     .then(() => {
-      // 2) En paralelo mando a Mailchimp (bridge)
+      // 2) Mailchimp por iframe (en paralelo)
       const form = $(FORM_ID);
       submitToMailchimp(form);
-      // 3) Redirige a tu página de gracias (ajústala si quieres)
+      // 3) Redirección a gracias
       window.location.assign('/gracias62332227');
     })
     .catch(err => {
@@ -255,7 +238,7 @@
     const form=$(FORM_ID); if(!form) return;
     form.setAttribute('novalidate','');
     form.addEventListener('submit', onSubmit);
-    ensureRecaptchaReady().then(placeV3Badge).catch(()=>{}); // mueve badge al slot
+    ensureRecaptchaReady().then(placeV3Badge).catch(()=>{});
   }
 
   (document.readyState==='loading') ? document.addEventListener('DOMContentLoaded', mount) : mount();
