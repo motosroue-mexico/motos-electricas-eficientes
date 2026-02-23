@@ -69,22 +69,129 @@ gtag('config', 'G-55Q1TCZSD2');
 <meta name="facebook-domain-verification" content="68tv03d2zeqny2tqayzok8exqo328i" />
 
 
-<!-- Meta Pixel Code -->
+<!-- Meta Pixel Code (con Advanced Matching manual para tu Mailchimp form) -->
 <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '865287708928999');
+!function(f,b,e,v,n,t,s){
+  if(f.fbq)return;
+  n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];
+  t=b.createElement(e);t.async=!0;
+  t.src=v;
+  s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s);
+}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+var PIXEL_ID = '865287708928999';
+
+/**
+ * Utilidades: normalización mínima (Meta hashea en SHA-256 si mandas texto plano)
+ * Recomendación: mandar lo más “limpio” posible.
+ */
+function _normEmail(v){
+  return (v || '').trim().toLowerCase();
+}
+function _normPhone(v){
+  // Deja solo dígitos. Si puedes, manda E.164 (ej: 521234567890).
+  return (v || '').replace(/[^\d]/g,'');
+}
+function _normText(v){
+  return (v || '').trim().toLowerCase();
+}
+
+var __pixelInitedWithAM = false;
+
+function initPixelWithAdvancedMatching(payload){
+  if (__pixelInitedWithAM) return;
+
+  try{
+    // Re-init con datos AM (Meta permite init adicional; evita spamear con el flag)
+    fbq('init', PIXEL_ID, payload || {});
+    __pixelInitedWithAM = true;
+  }catch(e){
+    // fallback: init básico
+    fbq('init', PIXEL_ID);
+  }
+}
+
+// Init básico al cargar (para no perder PageView)
+fbq('init', PIXEL_ID);
 fbq('track', 'PageView');
+
+/**
+ * Encuentra tu formulario de Mailchimp aun si se carga por fetch dentro de componentes.
+ * Luego intercepta submit para:
+ * 1) re-init del pixel con Advanced Matching
+ * 2) disparar un evento de conversión del lead
+ */
+function bindMailchimpAdvancedMatching(){
+  var form = document.querySelector('#mc-embedded-subscribe-form');
+  if (!form) return false;
+
+  if (form.__fbBound) return true;
+  form.__fbBound = true;
+
+  form.addEventListener('submit', function(){
+    // Lee inputs (usa IDs que ya tienes)
+    var email = _normEmail(document.querySelector('#mce-EMAIL')?.value);
+    var phone = _normPhone(document.querySelector('#mce-PHONE')?.value);
+    var fname = _normText(document.querySelector('#mce-FNAME')?.value);
+
+    var city  = _normText(document.querySelector('#mce-ADDRESS-city')?.value);
+    var state = _normText(document.querySelector('#mce-ADDRESS-state')?.value);
+    var zip   = _normText(document.querySelector('#mce-ADDRESS-zip')?.value);
+    var country = _normText(document.querySelector('#mce-ADDRESS-country')?.value);
+
+    // Payload Advanced Matching
+    // (manda solo lo que exista; no inventes valores)
+    var am = {};
+    if (email) am.em = email;
+    if (phone) am.ph = phone;
+    if (fname) am.fn = fname;
+    if (city) am.ct = city;
+    if (state) am.st = state;
+    if (zip) am.zp = zip;
+    if (country) am.country = country;
+
+    // Re-init con AM
+    initPixelWithAdvancedMatching(am);
+
+    // Evento de conversión del formulario
+    // Puedes usar "Lead" (estándar) o un custom como "FormSubmit"
+    fbq('track', 'Lead');
+
+    // Si quieres distinguir: fbq('trackCustom','MailchimpLead');
+  }, { passive: true });
+
+  return true;
+}
+
+// Intenta enlazar cuando carga el DOM y cuando terminan tus componentes
+document.addEventListener('DOMContentLoaded', function(){
+  bindMailchimpAdvancedMatching();
+});
+
+// Tu sitio carga componentes por fetch, así que escuchamos el evento global que ya disparas:
+document.addEventListener('components:all-ready', function(){
+  bindMailchimpAdvancedMatching();
+});
+
+// Extra: por si el form llega tarde (fallback con polling corto)
+(function(){
+  var tries = 0;
+  var iv = setInterval(function(){
+    tries++;
+    if (bindMailchimpAdvancedMatching() || tries >= 20) clearInterval(iv);
+  }, 500);
+})();
 </script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=865287708928999&ev=PageView&noscript=1"
-/></noscript>
+
+<noscript>
+  <img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=865287708928999&ev=PageView&noscript=1"/>
+</noscript>
 <!-- End Meta Pixel Code -->
 
 
