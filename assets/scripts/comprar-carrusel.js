@@ -7,13 +7,14 @@
   const pickSrc   = p => p?.acf?.['imagen-landing']?.url || p?.acf?.['imagen-landing'] || p?.image || '';
   const pickTitle = p => p?.acf?.['nombre-landing'] || p?.name || '';
   const pickUrl   = p => p?.permalink || '#';
-  const pickPrice = p => {
-    const raw = p?.sale_price || p?.price || p?.regular_price || '';
-    if (raw === '') return 'Ver detalles';
-    const n = Number(raw);
-    if (Number.isFinite(n)) return n.toLocaleString('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 });
-    return /^\$/.test(raw) ? raw : ('$' + raw);
-  };
+
+  // const pickPrice = p => {
+  //   const raw = p?.sale_price || p?.price || p?.regular_price || '';
+  //   if (raw === '') return 'Ver detalles';
+  //   const n = Number(raw);
+  //   if (Number.isFinite(n)) return n.toLocaleString('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 });
+  //   return /^\$/.test(raw) ? raw : ('$' + raw);
+  // };
 
   // --- UI helpers ---
   function syncButtons(cont) {
@@ -105,7 +106,8 @@
       const src   = pickSrc(p);
       const title = pickTitle(p) || 'Producto';
       const url   = pickUrl(p);
-      const price = pickPrice(p);
+      // const price = pickPrice(p);
+      const price = 'Ver detalles';
 
       if (src) img.src = src;
       img.alt = title;
